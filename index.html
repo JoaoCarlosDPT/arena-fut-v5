@@ -3,366 +3,293 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Arena Fut PRO V2</title>
-
+<title>Arena Fut PRO</title>
 <link rel="manifest" href="manifest.json">
 <meta name="theme-color" content="#0c0e11">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
-
-<!-- Firebase v9 compat -->
+<!-- Optional Google Maps: add your API key to enable Places Autocomplete -->
+<!-- <script src="https://maps.googleapis.com/maps/api/js?key=SUA_CHAVE_MAPS&libraries=places&callback=initMapsAutocomplete" async defer></script> -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 <style>
 /* =============================================
    VARIÁVEIS GLOBAIS
    ============================================= */
 :root {
-  --neon: #00ff88;
-  --dark: #000;
-  --card: #1a1a1a;
-  --card3: #15181d;
-  --border: #333;
-  --blue: #007bff;
-  --red: #dc3545;
-  --gold: #ffcc00;
-  --bg: #0c0e11;
-  --bg-color: #0c0e11;
-  --card-bg: #15181d;
-  --neon-cyan: #00f2ff;
-  --neon-red: #ff3c3c;
-  --text-white: #ffffff;
+  --neon: #00ff88; --dark: #000; --card: #1a1a1a;
+  --card3: #15181d; --border: #333; --blue: #007bff;
+  --red: #dc3545; --gold: #ffcc00; --bg: #0c0e11;
+  --card-bg: #15181d; --neon-cyan: #00f2ff; --neon-red: #ff3c3c;
   --text-gray: #a0a0a0;
 }
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body {
-  background: var(--dark);
-  color: #fff;
+  background: var(--dark); color: #fff;
   font-family: 'Segoe UI', -apple-system, sans-serif;
-  padding: 10px;
-  margin: 0;
-  padding-bottom: 160px;
-  overflow-x: hidden;
+  padding: 10px; margin: 0; padding-bottom: 160px; overflow-x: hidden;
+}
+
+/* =============================================
+   PÁGINA DE CONVITE — ESTILOS
+   ============================================= */
+#pagina-convite {
+  position: fixed; inset: 0; z-index: 99999;
+  background: #0c0e11; overflow-y: auto; display: none;
+}
+.convite-wrapper {
+  max-width: 480px; margin: 0 auto; padding: 0 16px 100px;
+}
+.convite-header {
+  background: linear-gradient(180deg, #0f1a0f 0%, #0c0e11 100%);
+  border-bottom: 1px solid #1a2a1a;
+  padding: 24px 16px 20px; text-align: center;
+}
+.convite-logo-strip {
+  font-size: 10px; font-weight: 900; letter-spacing: 4px;
+  color: var(--neon); text-transform: uppercase; margin-bottom: 10px;
+}
+.convite-nome-pelada {
+  font-size: 22px; font-weight: 900; color: #fff; margin: 0 0 6px;
+}
+.convite-subtitulo { font-size: 12px; color: #666; }
+
+/* Countdown */
+.convite-countdown {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 8px; padding: 20px 0 16px;
+}
+.cd-block {
+  background: #111; border: 1px solid #222; border-radius: 14px;
+  padding: 14px 6px; text-align: center;
+}
+.cd-num {
+  display: block; font-size: 26px; font-weight: 900;
+  color: var(--gold); line-height: 1;
+}
+.cd-label {
+  display: block; font-size: 8px; color: #555;
+  text-transform: uppercase; letter-spacing: 1px; margin-top: 4px;
+}
+.cd-expired {
+  grid-column: 1/-1; background: rgba(0,255,136,.08);
+  border: 1px solid rgba(0,255,136,.25); border-radius: 12px;
+  padding: 12px; text-align: center; color: var(--neon);
+  font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 2px;
+}
+
+/* Info grid */
+.convite-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 10px;
+}
+.convite-info-item {
+  background: #111; border: 1px solid #1e1e1e; border-radius: 12px; padding: 10px 12px;
+}
+.convite-info-item .lbl {
+  font-size: 8px; font-weight: 900; color: var(--neon-cyan);
+  text-transform: uppercase; letter-spacing: .5px; display: block; margin-bottom: 3px;
+}
+.convite-info-item .val { font-size: 13px; font-weight: bold; color: #fff; }
+.btn-ver-mapa {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  background: linear-gradient(135deg, #060e1e, #0c1830);
+  border: 1px solid #1a3a60; color: #4da6ff;
+  padding: 12px; border-radius: 12px; font-weight: bold; font-size: 12px;
+  text-decoration: none; text-transform: uppercase; letter-spacing: .5px;
+  margin-bottom: 16px;
+}
+
+/* Vagas */
+.vagas-card {
+  background: #111; border: 1px solid #222; border-radius: 14px;
+  padding: 14px; margin-bottom: 16px;
+}
+.vagas-row {
+  display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;
+}
+.vagas-titulo { font-size: 10px; font-weight: 900; text-transform: uppercase; color: #666; letter-spacing: 1px; }
+.vagas-num { font-size: 18px; font-weight: 900; color: var(--neon); }
+.vagas-bar-bg { background: #222; border-radius: 20px; height: 8px; overflow: hidden; }
+.vagas-bar-fill { height: 100%; border-radius: 20px; background: linear-gradient(90deg, var(--neon), var(--neon-cyan)); transition: width .5s ease; }
+.vagas-texto { font-size: 10px; color: #555; text-align: center; margin-top: 6px; }
+.vagas-esgotadas .vagas-num { color: var(--neon-red); }
+.vagas-bar-fill.esgotada { background: linear-gradient(90deg, #cc2200, var(--neon-red)); }
+
+/* Status badge */
+.meu-status-card {
+  border-radius: 12px; padding: 14px; text-align: center;
+  font-size: 13px; font-weight: 900; margin-bottom: 14px; letter-spacing: .5px;
+}
+.status-confirmado {
+  background: rgba(0,255,136,.08); border: 1px solid rgba(0,255,136,.3); color: var(--neon);
+}
+.status-espera {
+  background: rgba(255,204,0,.08); border: 1px solid rgba(255,204,0,.3); color: var(--gold);
+}
+
+/* CTAs */
+.convite-ctas { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+.btn-confirmar-convite {
+  background: linear-gradient(135deg, #00cc6a, var(--neon));
+  color: #000; padding: 17px; border: none; border-radius: 14px;
+  font-size: 15px; font-weight: 900; cursor: pointer; text-transform: uppercase;
+  letter-spacing: 1px; box-shadow: 0 0 24px rgba(0,255,136,.3);
+}
+.btn-cancelar-convite {
+  background: transparent; border: 1px solid rgba(255,60,60,.4);
+  color: var(--neon-red); padding: 12px; border-radius: 12px;
+  font-size: 12px; font-weight: bold; cursor: pointer; text-transform: uppercase;
+}
+
+/* PIX */
+.pix-card {
+  background: rgba(255,204,0,.05); border: 1px solid rgba(255,204,0,.25);
+  border-radius: 14px; padding: 14px; text-align: center; margin-bottom: 16px;
+}
+.pix-lbl { font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--gold); margin-bottom: 6px; }
+.pix-val { font-size: 16px; font-weight: 900; color: #fff; margin-bottom: 10px; letter-spacing: 1px; }
+.btn-copiar-pix {
+  background: var(--gold); color: #000; border: none; padding: 10px 22px;
+  border-radius: 10px; font-weight: 900; cursor: pointer; font-size: 12px; text-transform: uppercase;
+}
+.pix-copied { font-size: 11px; color: var(--neon); margin-top: 6px; display: none; }
+
+/* Listas */
+.convite-listas { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+.lista-card { background: #111; border: 1px solid #1e1e1e; border-radius: 12px; padding: 10px; }
+.lista-card-title {
+  font-size: 9px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px;
+  padding-bottom: 8px; border-bottom: 1px solid #222; margin-bottom: 6px;
+}
+.lista-card-title.conf-title { color: var(--neon); }
+.lista-card-title.esp-title  { color: var(--gold); }
+.lista-player-row {
+  font-size: 11px; padding: 5px 0; border-bottom: 1px solid #161616;
+  color: #ccc; display: flex; align-items: center; gap: 5px;
+}
+.lista-player-row:last-child { border-bottom: none; }
+.lista-player-eu { color: var(--neon); font-weight: bold; }
+.lista-player-pos { font-size: 8px; color: #444; min-width: 14px; }
+.lista-empty { font-size: 11px; color: #333; text-align: center; padding: 10px 0; }
+
+/* Accordion regras */
+.regras-accordion {
+  background: #111; border: 1px solid #1e1e1e; border-radius: 12px;
+  margin-bottom: 20px; overflow: hidden;
+}
+.regras-accordion summary {
+  padding: 14px 16px; font-size: 11px; font-weight: 900;
+  color: #666; cursor: pointer; text-transform: uppercase;
+  letter-spacing: 1px; list-style: none; user-select: none;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.regras-accordion summary::-webkit-details-marker { display: none; }
+.regras-accordion summary::after { content: '▼'; font-size: 9px; }
+.regras-accordion[open] summary::after { content: '▲'; }
+.regras-content {
+  padding: 0 16px 16px; font-size: 12px; color: #999;
+  line-height: 1.8; white-space: pre-line;
+}
+.convite-rodape {
+  text-align: center; font-size: 10px; color: #333; padding: 10px 0 20px;
+}
+
+/* =============================================
+   MODAL NOME CONVIDADO
+   ============================================= */
+.modal-nome-wrapper { text-align: center; }
+.modal-nome-wrapper h4 { margin: 0 0 6px; color: #fff; font-size: 16px; }
+.modal-nome-wrapper p { font-size: 12px; color: #888; margin: 0 0 16px; }
+#input-nome-convidado {
+  width: 100%; height: 48px; padding: 0 16px; border-radius: 12px;
+  border: 1px solid #333; background: #111; color: #fff; font-size: 15px;
+  outline: none; text-align: center; margin-bottom: 16px;
+}
+
+/* =============================================
+   MODAL PELADA CRIADA
+   ============================================= */
+.link-box {
+  background: #111; border: 1px solid #333; border-radius: 10px;
+  padding: 12px 14px; font-size: 12px; color: var(--neon-cyan);
+  word-break: break-all; margin: 12px 0; cursor: pointer;
+  text-align: center;
+}
+.link-box:hover { background: #1a1a1a; }
+.share-btns-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+.btn-wapp-share {
+  background: #25d366; color: #000; border: none; padding: 13px;
+  border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 12px; text-transform: uppercase;
+}
+.btn-copy-link {
+  background: #1a1a2a; border: 1px solid var(--neon-cyan); color: var(--neon-cyan);
+  padding: 13px; border-radius: 12px; font-weight: 900; cursor: pointer; font-size: 12px; text-transform: uppercase;
 }
 
 /* =============================================
    TELA 0 — LANDING PAGE
    ============================================= */
 #tela0 {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  background: #0c0e11;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 28px 24px 40px;
-  overflow: hidden;
+  position: fixed; inset: 0; z-index: 9999; background: #0c0e11;
+  display: flex; flex-direction: column; align-items: center;
+  justify-content: center; padding: 28px 24px 40px; overflow: hidden;
 }
-
-/* Partículas decorativas de fundo */
 #tela0::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,255,136,0.08) 0%, transparent 70%),
-    radial-gradient(ellipse 60% 40% at 20% 100%, rgba(0,242,255,0.06) 0%, transparent 60%);
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,255,136,.08) 0%, transparent 70%),
+              radial-gradient(ellipse 60% 40% at 20% 100%, rgba(0,242,255,.06) 0%, transparent 60%);
   pointer-events: none;
 }
-
-/* Campo SVG decorativo ao fundo */
 .t0-bg-field {
-  position: absolute;
-  width: 340px;
-  opacity: 0.04;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
+  position: absolute; width: 340px; opacity: .04;
+  top: 50%; left: 50%; transform: translate(-50%,-50%); pointer-events: none;
 }
-
-/* Logotipo / badge */
-.t0-badge {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 28px;
-  position: relative;
-  z-index: 1;
-}
-.t0-badge-icon {
-  font-size: 56px;
-  line-height: 1;
-  filter: drop-shadow(0 0 18px rgba(0,255,136,0.45));
-  margin-bottom: 6px;
-  animation: pulse-badge 2.4s ease-in-out infinite;
-}
-@keyframes pulse-badge {
-  0%,100% { transform: scale(1); filter: drop-shadow(0 0 18px rgba(0,255,136,0.45)); }
-  50%      { transform: scale(1.06); filter: drop-shadow(0 0 28px rgba(0,255,136,0.7)); }
-}
-.t0-app-name {
-  font-size: 22px;
-  font-weight: 900;
-  letter-spacing: 3px;
-  text-transform: uppercase;
-  background: linear-gradient(90deg, var(--neon), var(--neon-cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.t0-app-sub {
-  font-size: 10px;
-  font-weight: 700;
-  color: #444;
-  letter-spacing: 4px;
-  text-transform: uppercase;
-  margin-top: 2px;
-}
-
-/* Copy principal */
-.t0-copy {
-  text-align: center;
-  margin-bottom: 30px;
-  position: relative;
-  z-index: 1;
-}
-.t0-headline {
-  font-size: clamp(22px, 7vw, 30px);
-  font-weight: 900;
-  line-height: 1.2;
-  margin-bottom: 12px;
-  color: #fff;
-}
-.t0-headline .destaque {
-  background: linear-gradient(90deg, var(--neon), var(--neon-cyan));
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-.t0-sub {
-  font-size: 14px;
-  color: #888;
-  line-height: 1.6;
-  max-width: 320px;
-  margin: 0 auto;
-}
+.t0-badge { display: flex; flex-direction: column; align-items: center; margin-bottom: 28px; position: relative; z-index: 1; }
+.t0-badge-icon { font-size: 56px; line-height: 1; filter: drop-shadow(0 0 18px rgba(0,255,136,.45)); margin-bottom: 6px; animation: pulseBadge 2.4s ease-in-out infinite; }
+@keyframes pulseBadge { 0%,100%{transform:scale(1)}50%{transform:scale(1.06)} }
+.t0-app-name { font-size: 22px; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; background: linear-gradient(90deg,#00ff88,#00f2ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.t0-app-sub { font-size: 10px; font-weight: 700; color: #444; letter-spacing: 4px; text-transform: uppercase; margin-top: 2px; }
+.t0-copy { text-align: center; margin-bottom: 24px; position: relative; z-index: 1; }
+.t0-headline { font-size: clamp(22px,7vw,30px); font-weight: 900; line-height: 1.2; margin-bottom: 12px; color: #fff; }
+.t0-headline .destaque { background: linear-gradient(90deg,#00ff88,#00f2ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+.t0-sub { font-size: 14px; color: #888; line-height: 1.6; max-width: 320px; margin: 0 auto; }
 .t0-sub strong { color: #bbb; }
-
-/* Chips de features */
-.t0-chips {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-  justify-content: center;
-  margin-bottom: 32px;
-  position: relative;
-  z-index: 1;
-}
-.t0-chip {
-  background: rgba(255,255,255,0.05);
-  border: 1px solid #2a2a2a;
-  border-radius: 20px;
-  padding: 5px 12px;
-  font-size: 11px;
-  color: #888;
-  font-weight: 600;
-}
-.t0-chip span { margin-right: 4px; }
-
-/* Botões */
-.t0-btns {
-  width: 100%;
-  max-width: 340px;
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  position: relative;
-  z-index: 1;
-}
-
-/* Botão Google */
-.btn-google {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 14px 20px;
-  background: #fff;
-  color: #3c4043;
-  font-size: 14px;
-  font-weight: 700;
-  border-radius: 12px;
-  border: none;
-  cursor: pointer;
-  text-transform: none;
-  letter-spacing: 0.2px;
-  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.btn-google:active { transform: scale(0.97); }
-.btn-google svg { flex-shrink: 0; }
-
-/* Botão instalar PWA */
-.btn-install {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
-  width: 100%;
-  padding: 14px 20px;
-  background: linear-gradient(135deg, #0d1f14, #0a1a10);
-  color: var(--neon);
-  font-size: 14px;
-  font-weight: 700;
-  border-radius: 12px;
-  border: 1px solid rgba(0,255,136,0.35);
-  cursor: pointer;
-  text-transform: none;
-  letter-spacing: 0.2px;
-  box-shadow: 0 0 16px rgba(0,255,136,0.12);
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.btn-install:active { transform: scale(0.97); }
-.btn-install .install-icon { font-size: 20px; }
-
-/* Texto iOS instrução */
-.ios-install-tip {
-  background: rgba(0,242,255,0.07);
-  border: 1px solid rgba(0,242,255,0.2);
-  border-radius: 10px;
-  padding: 10px 14px;
-  font-size: 11px;
-  color: #7ecfda;
-  line-height: 1.6;
-  text-align: center;
-  display: none;
-}
+.t0-chips { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; margin-bottom: 28px; position: relative; z-index: 1; }
+.t0-chip { background: rgba(255,255,255,.05); border: 1px solid #2a2a2a; border-radius: 20px; padding: 5px 12px; font-size: 11px; color: #888; font-weight: 600; }
+.t0-btns { width: 100%; max-width: 340px; display: flex; flex-direction: column; gap: 12px; position: relative; z-index: 1; }
+.btn-google { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px 20px; background: #fff; color: #3c4043; font-size: 14px; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; text-transform: none; box-shadow: 0 2px 12px rgba(0,0,0,.4); transition: transform .15s; }
+.btn-google:active { transform: scale(.97); }
+.btn-install { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 14px 20px; background: linear-gradient(135deg,#0d1f14,#0a1a10); color: var(--neon); font-size: 14px; font-weight: 700; border-radius: 12px; border: 1px solid rgba(0,255,136,.35); cursor: pointer; text-transform: none; transition: transform .15s; }
+.ios-install-tip { background: rgba(0,242,255,.07); border: 1px solid rgba(0,242,255,.2); border-radius: 10px; padding: 10px 14px; font-size: 11px; color: #7ecfda; line-height: 1.6; text-align: center; display: none; }
 .ios-install-tip.show { display: block; }
-
-/* Texto persuasivo abaixo do install */
-.t0-install-sub {
-  text-align: center;
-  font-size: 11px;
-  color: #555;
-  line-height: 1.5;
-  margin-top: -4px;
-}
-
-/* Skip link */
-.t0-skip {
-  margin-top: 10px;
-  font-size: 11px;
-  color: #444;
-  cursor: pointer;
-  text-decoration: underline;
-  text-underline-offset: 3px;
-  text-align: center;
-  background: none;
-  border: none;
-  width: 100%;
-  text-transform: none;
-  letter-spacing: 0;
-  font-weight: 400;
-}
-.t0-skip:hover { color: #666; }
-
-/* Loading spinner */
-.t0-loader {
-  display: none;
-  width: 20px;
-  height: 20px;
-  border: 2px solid rgba(60,64,67,0.3);
-  border-top-color: #4285f4;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
+.t0-skip { margin-top: 4px; font-size: 11px; color: #444; cursor: pointer; text-decoration: underline; text-align: center; background: none; border: none; width: 100%; text-transform: none; font-weight: 400; }
+.t0-loader { display: none; width: 20px; height: 20px; border: 2px solid rgba(60,64,67,.3); border-top-color: #4285f4; border-radius: 50%; animation: spin .7s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 .btn-google.loading .t0-loader { display: block; }
 .btn-google.loading .btn-google-content { display: none; }
-
-/* Toast de boas-vindas */
-.t0-toast {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%) translateY(80px);
-  background: #1a2d20;
-  border: 1px solid rgba(0,255,136,0.4);
-  border-radius: 12px;
-  padding: 10px 18px;
-  font-size: 13px;
-  color: var(--neon);
-  font-weight: 700;
-  z-index: 10000;
-  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
-  white-space: nowrap;
-  pointer-events: none;
-}
+.t0-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(80px); background: #1a2d20; border: 1px solid rgba(0,255,136,.4); border-radius: 12px; padding: 10px 18px; font-size: 13px; color: var(--neon); font-weight: 700; z-index: 10000; transition: transform .35s cubic-bezier(.34,1.56,.64,1); white-space: nowrap; pointer-events: none; }
 .t0-toast.show { transform: translateX(-50%) translateY(0); }
 
 /* =============================================
-   ESTILOS GERAIS — TELA 1 e TELA 2
+   ESTILOS GERAIS — TELA 1/2
    ============================================= */
-.card {
-  background: var(--card);
-  padding: 15px;
-  border-radius: 16px;
-  margin-bottom: 12px;
-  border: 1px solid var(--border);
-  position: relative;
-  box-sizing: border-box;
-}
-button {
-  border-radius: 12px;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
-  text-transform: uppercase;
-  transition: 0.2s;
-}
+.card { background: var(--card); padding: 15px; border-radius: 16px; margin-bottom: 12px; border: 1px solid var(--border); position: relative; }
+button { border-radius: 12px; border: none; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: .2s; }
 .btn-neon { background: var(--neon); color: #000; padding: 15px; width: 100%; font-size: 1rem; }
-label {
-  font-size: 0.65rem;
-  color: var(--neon);
-  font-weight: 900;
-  text-transform: uppercase;
-  display: block;
-  margin-bottom: 6px;
-  margin-left: 5px;
-}
-input, textarea, select {
-  width: 100%;
-  height: 48px;
-  padding: 0 12px;
-  border-radius: 12px;
-  border: 1px solid var(--border);
-  background: #111;
-  color: #fff;
-  box-sizing: border-box;
-  font-size: 14px;
-  outline: none;
-  -webkit-appearance: none;
-  appearance: none;
-}
+label { font-size: .65rem; color: var(--neon); font-weight: 900; text-transform: uppercase; display: block; margin-bottom: 6px; margin-left: 5px; }
+input, textarea, select { width: 100%; height: 48px; padding: 0 12px; border-radius: 12px; border: 1px solid var(--border); background: #111; color: #fff; box-sizing: border-box; font-size: 14px; outline: none; -webkit-appearance: none; appearance: none; }
 textarea { height: auto; padding: 12px; resize: none; }
 .row { display: flex; gap: 10px; margin-bottom: 15px; }
 .col { flex: 1; }
-
-/* TELA 2 */
 .header-lista { border-top: 2px solid #634d1a; padding-top: 15px; margin-top: 20px; }
 .titulo-secao { color: #fff; font-size: 14px; font-weight: bold; display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
 .status-container { display: flex; gap: 10px; margin-bottom: 20px; width: 100%; }
 .status-box { flex: 1; background: #111; padding: 10px; border-radius: 12px; border: 1px solid #222; }
 .status-label { font-size: 11px; font-weight: 900; display: flex; justify-content: space-between; margin-bottom: 5px; text-transform: uppercase; }
 .bar-bg { background: #222; height: 10px; border-radius: 20px; overflow: hidden; }
-.bar-fill { height: 100%; border-radius: 20px; transition: 0.3s; }
+.bar-fill { height: 100%; border-radius: 20px; transition: .3s; }
 .search-box { background: #111; border: 1px solid #222; border-radius: 20px; padding: 10px; margin-bottom: 15px; display: flex; align-items: center; }
 .search-box input { background: transparent; border: none; color: #fff; width: 100%; outline: none; font-size: 13px; margin-left: 8px; height: auto; padding: 0; }
 .atleta-item { display: flex; align-items: center; background: #1a1a1a; padding: 12px; border-radius: 15px; margin-bottom: 10px; gap: 12px; border: 1px solid #222; }
@@ -370,24 +297,24 @@ textarea { height: auto; padding: 12px; resize: none; }
 .atleta-check:checked { background: var(--neon); }
 .atleta-check:checked::after { content: '✓'; position: absolute; color: #000; font-weight: 900; font-size: 14px; left: 3px; top: -2px; }
 .atleta-avatar { width: 45px; height: 45px; background: #444; border-radius: 50%; display: flex; align-items: center; justify-content: center; overflow: hidden; flex-shrink: 0; }
-.atleta-avatar img { width: 100%; height: 100%; object-fit: cover; opacity: 0.6; }
+.atleta-avatar img { width: 100%; height: 100%; object-fit: cover; opacity: .6; }
 .atleta-dados { flex: 1; min-width: 0; }
 .atleta-nome { display: block; font-weight: bold; font-size: 14px; margin-bottom: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tag { font-size: 9px; font-weight: 900; padding: 3px 10px; border-radius: 10px; text-transform: uppercase; display: inline-block; margin-bottom: 4px; cursor: pointer; user-select: none; }
-.tag-mensalista { background: rgba(0,255,136,0.15); color: var(--neon); border: 1px solid rgba(0,255,136,0.3); }
-.tag-convidado { background: rgba(0,123,255,0.15); color: #007bff; border: 1px solid rgba(0,123,255,0.3); }
+.tag-mensalista { background: rgba(0,255,136,.15); color: var(--neon); border: 1px solid rgba(0,255,136,.3); }
+.tag-convidado { background: rgba(0,123,255,.15); color: #007bff; border: 1px solid rgba(0,123,255,.3); }
 .estrelas { color: var(--gold); font-size: 16px; margin-top: 4px; letter-spacing: 2px; cursor: pointer; user-select: none; }
 .pos-badge { width: 35px; height: 35px; background: #222; border: 1px solid #333; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; }
 .pos-badge span:first-child { font-size: 18px; }
 .pos-badge span:last-child { font-size: 10px; font-weight: 900; color: var(--gold); margin-top: -3px; }
-.fixed-footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,0.95); padding: 15px; border-top: 1px solid #222; z-index: 100; padding-bottom: 25px; }
+.fixed-footer { position: fixed; bottom: 0; left: 0; right: 0; background: rgba(0,0,0,.95); padding: 15px; border-top: 1px solid #222; z-index: 100; padding-bottom: 25px; }
 .btn-row { display: flex; gap: 10px; margin-bottom: 12px; }
-.btn-outline { flex: 1; background: transparent; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; text-align: center; }
+.btn-outline { flex: 1; background: transparent; border: 1px solid #333; color: #fff; padding: 10px; border-radius: 10px; font-size: 11px; font-weight: bold; text-transform: uppercase; text-align: center; cursor: pointer; }
 .info-footer { text-align: center; font-size: 11px; color: #666; font-weight: bold; margin-bottom: 12px; letter-spacing: 1px; text-transform: uppercase; }
 .hidden { display: none; }
 
 /* =============================================
-   TELA 3 — WRAPPER SPA
+   TELA 3
    ============================================= */
 #tela3 { display: none; }
 #tela3.active { display: flex; justify-content: center; }
@@ -396,7 +323,7 @@ textarea { height: auto; padding: 12px; resize: none; }
 .screen.active { display: flex; }
 .header-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
 .btn-nav { background: #222; border: 1px solid #444; color: #fff; padding: 5px 15px; border-radius: 10px; cursor: pointer; font-size: 12px; }
-.clock { font-size: clamp(50px,15vw,65px); color: var(--gold); font-weight: bold; text-align: center; margin: 5px 0; text-shadow: 0 0 20px rgba(255,204,0,0.3); }
+.clock { font-size: clamp(50px,15vw,65px); color: var(--gold); font-weight: bold; text-align: center; margin: 5px 0; text-shadow: 0 0 20px rgba(255,204,0,.3); }
 .controls { display: flex; justify-content: center; gap: 12px; margin-bottom: 5px; }
 .btn-c { width: 38px; height: 38px; border-radius: 50%; border: 1px solid #333; background: #222; color: #fff; display: flex; align-items: center; justify-content: center; cursor: pointer; }
 .scoreboard { display: flex; justify-content: center; gap: 20px; margin-bottom: 10px; }
@@ -424,48 +351,27 @@ textarea { height: auto; padding: 12px; resize: none; }
 .ranking-table th { background: #222; padding: 8px; color: #666; text-align: left; }
 .ranking-table td { padding: 8px; border-bottom: 1px solid #222; }
 
-/* MODAIS */
-.modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:999; }
-.m-content { background: var(--card3); width:90%; max-height:80vh; overflow-y:auto; padding:20px; border-radius:20px; border:1px solid #333; }
-.fila-edit-item { background: #222; margin-bottom: 8px; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: grab; border: 1px solid #333; }
-.fila-edit-item.dragging { opacity: 0.5; background: #333; }
-.edit-btns { display: flex; gap: 5px; }
-.btn-edit { background: #333; border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 14px; }
-.btn-confirm { padding: 12px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-.sub-player-btn { width: 100%; padding: 11px 14px; margin: 5px 0; background: #222; color: #fff; border: 1px solid #444; border-radius: 10px; font-size: 12px; text-align: left; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
-.sub-player-btn.selected { border-color: var(--neon); color: var(--neon); background: rgba(0,255,136,0.08); }
-.sub-check-label { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: #ccc; margin: 14px 0 16px; cursor: pointer; line-height: 1.4; }
-.sub-check-label input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; border: 2px solid var(--gold); border-radius: 4px; appearance: none; -webkit-appearance: none; background: #111; cursor: pointer; position: relative; margin-top: 1px; }
-.sub-check-label input[type="checkbox"]:checked { background: var(--gold); }
-.sub-check-label input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: #000; font-weight: 900; font-size: 12px; left: 2px; top: -1px; }
-.sub-info-box { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #aaa; line-height: 1.6; }
-.sub-info-box strong { color: var(--neon-red); }
-.sub-section-label { font-size: 10px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
-.sub-empty-msg { font-size: 12px; color: #555; padding: 10px 0; text-align: center; }
-
-/* =============================================
-   TELA 4 — RELATÓRIO FINAL
-   ============================================= */
+/* TELA 4 */
 #screen-4 .screen-container { width: 100%; max-width: 450px; padding-bottom: 20px; margin: 0 auto; }
 #screen-4 .t4-header { text-align: center; margin-bottom: 16px; }
 #screen-4 .logo-title { font-weight: 800; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
 #screen-4 .report-bar { background: linear-gradient(90deg,#004d4f,var(--neon-cyan)); padding: 8px 15px; border-radius: 50px; font-size: 11px; margin: 10px 0; font-weight: bold; display: inline-block; clip-path: polygon(10% 0,100% 0,90% 100%,0% 100%); }
 #screen-4 .stats-total { font-size: 10px; color: var(--text-gray); }
-#screen-4 .event-info-bar { background: linear-gradient(135deg,rgba(0,242,255,0.06),rgba(0,77,79,0.3)); border: 1px solid rgba(0,242,255,0.35); border-radius: 12px; padding: 10px 12px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: space-around; }
+#screen-4 .event-info-bar { background: linear-gradient(135deg,rgba(0,242,255,.06),rgba(0,77,79,.3)); border: 1px solid rgba(0,242,255,.35); border-radius: 12px; padding: 10px 12px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: space-around; }
 #screen-4 .ei-item { text-align: center; flex: 1; min-width: 60px; }
-#screen-4 .ei-label { font-size: 8px; color: var(--neon-cyan); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
+#screen-4 .ei-label { font-size: 8px; color: var(--neon-cyan); font-weight: 900; text-transform: uppercase; letter-spacing: .5px; }
 #screen-4 .ei-value { font-size: 11px; color: #fff; font-weight: bold; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 #screen-4 .field-view { width: 100%; height: 300px; border: 2px solid var(--neon-cyan); border-radius: 14px; background: #111; position: relative; margin-bottom: 8px; overflow: hidden; }
 #screen-4 .pitch-svg { width: 100%; height: 100%; display: block; }
-#screen-4 .formation-label { text-align: center; font-size: 9px; font-weight: 900; color: var(--neon-cyan); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; opacity: 0.8; }
+#screen-4 .formation-label { text-align: center; font-size: 9px; font-weight: 900; color: var(--neon-cyan); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; opacity: .8; }
 #screen-4 .player-dot { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; z-index: 2; }
-#screen-4 .dot { width: 26px; height: 26px; background: var(--neon-cyan); border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; color: #000; box-shadow: 0 0 10px rgba(0,242,255,0.75),0 0 20px rgba(0,242,255,0.3); }
-#screen-4 .player-name-tag { font-size: 7px; color: #fff; font-weight: 800; background: rgba(0,0,0,0.75); padding: 1px 5px; border-radius: 4px; white-space: nowrap; max-width: 46px; overflow: hidden; text-overflow: ellipsis; }
+#screen-4 .dot { width: 26px; height: 26px; background: var(--neon-cyan); border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; color: #000; box-shadow: 0 0 10px rgba(0,242,255,.75),0 0 20px rgba(0,242,255,.3); }
+#screen-4 .player-name-tag { font-size: 7px; color: #fff; font-weight: 800; background: rgba(0,0,0,.75); padding: 1px 5px; border-radius: 4px; white-space: nowrap; max-width: 46px; overflow: hidden; text-overflow: ellipsis; }
 #screen-4 .mvp-wrapper { display: grid; grid-template-columns: 1fr 1.3fr 1fr; align-items: end; gap: 8px; margin-bottom: 30px; }
-#screen-4 .card-player { background: #1a1a1a; padding: 10px 5px; text-align: center; border-radius: 10px; min-height: 50px; transition: transform 0.2s; }
-#screen-4 .card-red { border: 2px solid var(--neon-red); box-shadow: 0 0 16px rgba(255,60,60,0.5),0 4px 22px rgba(255,60,60,0.25),inset 0 0 12px rgba(255,60,60,0.06); transform: scale(1.04); }
-#screen-4 .card-gold { border: 2px solid var(--gold); box-shadow: 0 0 28px rgba(255,204,0,0.65),0 6px 32px rgba(255,204,0,0.35),inset 0 0 16px rgba(255,204,0,0.08); transform: scale(1.14); z-index: 2; background: linear-gradient(160deg,#1e1a00,#1a1a1a); }
-#screen-4 .card-blue { border: 2px solid var(--neon-cyan); box-shadow: 0 0 16px rgba(0,242,255,0.5),0 4px 22px rgba(0,242,255,0.25),inset 0 0 12px rgba(0,242,255,0.06); transform: scale(1.04); }
+#screen-4 .card-player { background: #1a1a1a; padding: 10px 5px; text-align: center; border-radius: 10px; min-height: 50px; transition: transform .2s; }
+#screen-4 .card-red  { border: 2px solid var(--neon-red); box-shadow: 0 0 16px rgba(255,60,60,.5),0 4px 22px rgba(255,60,60,.25); transform: scale(1.04); }
+#screen-4 .card-gold { border: 2px solid var(--gold); box-shadow: 0 0 28px rgba(255,204,0,.65),0 6px 32px rgba(255,204,0,.35); transform: scale(1.14); z-index: 2; background: linear-gradient(160deg,#1e1a00,#1a1a1a); }
+#screen-4 .card-blue { border: 2px solid var(--neon-cyan); box-shadow: 0 0 16px rgba(0,242,255,.5),0 4px 22px rgba(0,242,255,.25); transform: scale(1.04); }
 #screen-4 .stat-val { font-size: 16px; font-weight: 900; color: var(--gold); }
 #screen-4 .card-gold .stat-val { font-size: 20px; }
 #screen-4 .label-stat { font-size: 7px; color: var(--text-gray); text-transform: uppercase; }
@@ -475,16 +381,114 @@ textarea { height: auto; padding: 12px; resize: none; }
 #screen-4 .presence-box { background: #111; padding: 15px; border-radius: 10px; text-align: center; font-size: 10px; color: var(--text-gray); }
 #screen-4 .t4-footer { text-align: center; margin-top: 20px; font-size: 12px; color: var(--text-gray); }
 #screen-4 .btn-share { background: var(--neon-cyan); color: #000; border: none; padding: 12px; border-radius: 10px; width: 100%; margin-top: 20px; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 12px; }
+
+/* MODAIS */
+.modal { position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.95); display:none; align-items:center; justify-content:center; z-index:999; }
+.m-content { background: var(--card3); width:90%; max-height:80vh; overflow-y:auto; padding:20px; border-radius:20px; border:1px solid #333; }
+.fila-edit-item { background: #222; margin-bottom: 8px; padding: 10px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; cursor: grab; border: 1px solid #333; }
+.fila-edit-item.dragging { opacity: .5; background: #333; }
+.edit-btns { display: flex; gap: 5px; }
+.btn-edit { background: #333; border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 14px; }
+.btn-confirm { padding: 12px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
+.sub-player-btn { width: 100%; padding: 11px 14px; margin: 5px 0; background: #222; color: #fff; border: 1px solid #444; border-radius: 10px; font-size: 12px; text-align: left; cursor: pointer; transition: border-color .15s; }
+.sub-player-btn.selected { border-color: var(--neon); color: var(--neon); background: rgba(0,255,136,.08); }
+.sub-check-label { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: #ccc; margin: 14px 0 16px; cursor: pointer; line-height: 1.4; }
+.sub-check-label input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; border: 2px solid var(--gold); border-radius: 4px; appearance: none; -webkit-appearance: none; background: #111; cursor: pointer; position: relative; margin-top: 1px; }
+.sub-check-label input[type="checkbox"]:checked { background: var(--gold); }
+.sub-check-label input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: #000; font-weight: 900; font-size: 12px; left: 2px; top: -1px; }
+.sub-info-box { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #aaa; line-height: 1.6; }
+.sub-info-box strong { color: var(--neon-red); }
+.sub-section-label { font-size: 10px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.sub-empty-msg { font-size: 12px; color: #555; padding: 10px 0; text-align: center; }
 </style>
 </head>
 <body>
 
 <!-- =============================================
+     PÁGINA DE CONVITE (MODO INVITE)
+     ============================================= -->
+<div id="pagina-convite">
+  <div class="convite-wrapper">
+
+    <div class="convite-header">
+      <div class="convite-logo-strip">⚽ Arena Fut PRO</div>
+      <h2 class="convite-nome-pelada" id="c-nome">Carregando...</h2>
+      <p class="convite-subtitulo" id="c-subtitulo">Você foi convidado para uma pelada!</p>
+    </div>
+
+    <!-- Countdown -->
+    <div class="convite-countdown" id="c-countdown">
+      <div class="cd-block"><span class="cd-num" id="cd-dias">--</span><span class="cd-label">dias</span></div>
+      <div class="cd-block"><span class="cd-num" id="cd-horas">--</span><span class="cd-label">horas</span></div>
+      <div class="cd-block"><span class="cd-num" id="cd-min">--</span><span class="cd-label">min</span></div>
+      <div class="cd-block"><span class="cd-num" id="cd-seg">--</span><span class="cd-label">seg</span></div>
+    </div>
+
+    <!-- Info grid -->
+    <div class="convite-info-grid">
+      <div class="convite-info-item"><span class="lbl">📅 Data</span><span class="val" id="c-data">--</span></div>
+      <div class="convite-info-item"><span class="lbl">⏰ Horário</span><span class="val" id="c-hora">--</span></div>
+      <div class="convite-info-item"><span class="lbl">📍 Local</span><span class="val" id="c-local">--</span></div>
+      <div class="convite-info-item"><span class="lbl">⚽ Formato</span><span class="val" id="c-formato">--</span></div>
+    </div>
+    <a id="c-btn-mapa" href="#" target="_blank" class="btn-ver-mapa">🗺️ Ver no Google Maps / GPS</a>
+
+    <!-- Vagas -->
+    <div class="vagas-card" id="c-vagas-card">
+      <div class="vagas-row">
+        <span class="vagas-titulo">Vagas</span>
+        <span class="vagas-num" id="c-vagas-num">0/0</span>
+      </div>
+      <div class="vagas-bar-bg"><div class="vagas-bar-fill" id="c-vagas-fill" style="width:0%"></div></div>
+      <p class="vagas-texto" id="c-vagas-texto">Carregando...</p>
+    </div>
+
+    <!-- Meu status -->
+    <div class="meu-status-card" id="c-meu-status" style="display:none;"></div>
+
+    <!-- CTAs -->
+    <div class="convite-ctas" id="c-ctas">
+      <button class="btn-confirmar-convite" id="btn-confirmar-convite" onclick="abrirModalNomeConvite()">✅ CONFIRMAR PRESENÇA</button>
+      <button class="btn-cancelar-convite" id="btn-cancelar-convite" style="display:none;" onclick="cancelarPresencaConvite()">❌ CANCELAR PRESENÇA</button>
+    </div>
+
+    <!-- PIX -->
+    <div class="pix-card" id="c-pix-card" style="display:none;">
+      <p class="pix-lbl">💰 Chave PIX para pagamento</p>
+      <p class="pix-val" id="c-pix-val">--</p>
+      <button class="btn-copiar-pix" onclick="copiarPixConvite()">📋 COPIAR CHAVE PIX</button>
+      <p class="pix-copied" id="pix-copied-msg">✓ Copiado!</p>
+    </div>
+
+    <!-- Listas em tempo real -->
+    <div class="convite-listas">
+      <div class="lista-card">
+        <div class="lista-card-title conf-title">✅ CONFIRMADOS (<span id="c-count-conf">0</span>)</div>
+        <div id="c-lista-conf"><div class="lista-empty">Nenhum ainda</div></div>
+      </div>
+      <div class="lista-card">
+        <div class="lista-card-title esp-title">⏳ ESPERA (<span id="c-count-esp">0</span>)</div>
+        <div id="c-lista-esp"><div class="lista-empty">Fila vazia</div></div>
+      </div>
+    </div>
+
+    <!-- Regras accordion -->
+    <details class="regras-accordion" id="c-regras-accordion" style="display:none;">
+      <summary>📋 Regras da Casa</summary>
+      <div class="regras-content" id="c-regras-content"></div>
+    </details>
+
+    <div class="convite-rodape">⚽ Arena Fut PRO — Gestão de Pelada</div>
+  </div>
+</div>
+
+<!-- Toast global -->
+<div class="t0-toast" id="t0-toast">⚽ É nóis!</div>
+
+<!-- =============================================
      TELA 0 — LANDING PAGE
      ============================================= -->
 <div id="tela0">
-
-  <!-- Campo decorativo de fundo -->
   <svg class="t0-bg-field" viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
     <rect x="5" y="5" width="190" height="120" rx="4" stroke="white" stroke-width="2"/>
     <line x1="100" y1="5" x2="100" y2="125" stroke="white" stroke-width="1.5"/>
@@ -494,44 +498,26 @@ textarea { height: auto; padding: 12px; resize: none; }
     <rect x="5" y="52" width="12" height="22" stroke="white" stroke-width="1.5"/>
     <rect x="183" y="52" width="12" height="22" stroke="white" stroke-width="1.5"/>
   </svg>
-
-  <!-- Badge / logo -->
   <div class="t0-badge">
     <div class="t0-badge-icon">⚽</div>
     <div class="t0-app-name">Arena Fut PRO</div>
     <div class="t0-app-sub">Gestão de Pelada</div>
   </div>
-
-  <!-- Copy principal -->
   <div class="t0-copy">
-    <div class="t0-headline">
-      Sua pelada tá no<br>
-      <span class="destaque">próximo nível, craque!</span>
-    </div>
-    <p class="t0-sub">
-      Escalação, gols, ranking e resenha —
-      <strong>tudo numa tela só.</strong>
-      É gol de placa na organização! ⚡
-    </p>
+    <div class="t0-headline">Sua pelada tá no<br><span class="destaque">próximo nível, craque!</span></div>
+    <p class="t0-sub">Escalação, gols, ranking e resenha — <strong>tudo numa tela só.</strong> É gol de placa na organização! ⚡</p>
   </div>
-
-  <!-- Chips de features -->
   <div class="t0-chips">
     <div class="t0-chip"><span>🏆</span>Ranking</div>
     <div class="t0-chip"><span>⏱️</span>Timer</div>
     <div class="t0-chip"><span>📋</span>Fila</div>
-    <div class="t0-chip"><span>📤</span>Compartilhar</div>
-    <div class="t0-chip"><span>🔄</span>Substituição</div>
+    <div class="t0-chip"><span>🔗</span>Convite</div>
+    <div class="t0-chip"><span>📤</span>Share</div>
   </div>
-
-  <!-- Botões de ação -->
   <div class="t0-btns">
-
-    <!-- Botão Google Login -->
     <button class="btn-google" id="btn-google-login" onclick="loginGoogle()">
       <div class="t0-loader" id="google-loader"></div>
-      <div class="btn-google-content" style="display:flex; align-items:center; gap:10px;">
-        <!-- Logo oficial Google SVG -->
+      <div class="btn-google-content" style="display:flex;align-items:center;gap:10px;">
         <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
           <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
           <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
@@ -541,42 +527,24 @@ textarea { height: auto; padding: 12px; resize: none; }
         <span>Entrar com Google</span>
       </div>
     </button>
-
-    <!-- Botão instalar PWA (aparece só quando disponível) -->
     <button class="btn-install hidden" id="btn-install-pwa" onclick="instalarPWA()">
-      <span class="install-icon">📲</span>
+      <span style="font-size:20px;">📲</span>
       <span id="install-btn-text">Instalar App</span>
     </button>
-
-    <!-- Dica iOS (aparece só no Safari/iOS) -->
-    <div class="ios-install-tip" id="ios-tip">
-      📱 No iPhone: toque em <strong style="color:#fff;">Compartilhar</strong> → depois em
-      <strong style="color:#fff;">"Adicionar à Tela de Início"</strong> para ter o app na tela inicial!
-    </div>
-
-    <!-- Texto persuasivo do install -->
-    <p class="t0-install-sub" id="install-sub-text" style="display:none;">
-      Pra não perder a resenha e ter seu time na mão, baixa logo o app e deixa na tela inicial! É de graça! 🔥
-    </p>
-
-    <!-- Pular e ir direto -->
+    <div class="ios-install-tip" id="ios-tip">📱 No iPhone: <strong style="color:#fff;">Compartilhar</strong> → <strong style="color:#fff;">"Adicionar à Tela de Início"</strong></div>
     <button class="t0-skip" onclick="entrarSemLogin()">Continuar sem conta →</button>
   </div>
-
 </div>
-
-<!-- Toast de boas-vindas -->
-<div class="t0-toast" id="t0-toast">⚽ É nóis, craque! Bem-vindo ao Arena Fut PRO!</div>
 
 <!-- ===== TELA 1: CONFIGURAÇÃO ===== -->
 <div id="tela1" class="hidden">
-  <div class="card" style="border-top: 5px solid var(--neon);">
-    <div id="saudacao-container" style="text-align:left; margin-bottom:25px; background:rgba(0,255,136,0.05); padding:15px; border-radius:12px; border:1px solid #222;">
-      <h3 id="txt-saudacao" style="color:var(--neon); margin:0; font-size:1.1rem; line-height:1.4;">Carregando...</h3>
-      <p style="color:#666; font-size:0.75rem; margin-top:8px; font-weight:bold; text-transform:uppercase;">🎮 Painel do Gestor</p>
+  <div class="card" style="border-top:5px solid var(--neon);">
+    <div id="saudacao-container" style="text-align:left;margin-bottom:25px;background:rgba(0,255,136,.05);padding:15px;border-radius:12px;border:1px solid #222;">
+      <h3 id="txt-saudacao" style="color:var(--neon);margin:0;font-size:1.1rem;line-height:1.4;">Carregando...</h3>
+      <p style="color:#666;font-size:.75rem;margin-top:8px;font-weight:bold;text-transform:uppercase;">🎮 Painel do Gestor</p>
     </div>
     <div class="row"><div class="col"><label>Nome da Pelada</label><input id="nomeEvento" placeholder="Ex: Pelada dos Amigos"></div></div>
-    <div class="row"><div class="col"><label>Local da Arena</label><input id="local" placeholder="Ex: Arena Soccer X"></div></div>
+    <div class="row"><div class="col"><label>Local da Arena</label><input id="local" placeholder="Ex: Arena Soccer X, Rua das Flores, 100"></div></div>
     <div class="row">
       <div class="col" style="flex:1.4;"><label>Data</label><input id="dataEv" type="date"></div>
       <div class="col"><label>Horário</label><input id="horarioEv" type="time"></div>
@@ -589,13 +557,15 @@ textarea { height: auto; padding: 12px; resize: none; }
       <div class="col"><label>Tempo (Min)</label><input id="tempoRegra" type="number" placeholder="Ex: 10"></div>
       <div class="col">
         <label>Tipo de Campo</label>
-        <select id="tipoCampo">
-          <option value="" disabled selected>Selecione...</option>
-          <option>Society</option><option>Futsal</option><option>Campo</option>
-        </select>
+        <select id="tipoCampo"><option value="" disabled selected>Selecione...</option><option>Society</option><option>Futsal</option><option>Campo</option></select>
       </div>
     </div>
-    <button class="btn-neon" onclick="irTela2()">CONVOCAR ATLETAS →</button>
+    <!-- NOVO: Campos do convite -->
+    <div class="row"><div class="col"><label>💰 Chave PIX (pagamento)</label><input id="pixKey" placeholder="Ex: 11999999999 ou email@pix.com"></div></div>
+    <div class="row"><div class="col"><label>📋 Regras da Casa</label><textarea id="regras" rows="3" style="height:auto;" placeholder="Ex: Pontualidade é fundamental. Sem faltas de trás..."></textarea></div></div>
+    <!-- NOVO: Botão criar pelada + convite -->
+    <button class="btn-neon" onclick="salvarPeladaEGerarConvite()" style="background:linear-gradient(135deg,#00cc6a,#00ff88);margin-bottom:10px;">🔗 CRIAR PELADA E GERAR CONVITE</button>
+    <button class="btn-neon" onclick="irTela2()" style="background:transparent;border:1px solid #333;color:#888;">APENAS CONFIGURAR JOGO →</button>
   </div>
 </div>
 
@@ -603,7 +573,7 @@ textarea { height: auto; padding: 12px; resize: none; }
 <div id="tela2" class="hidden">
   <div class="header-nav" style="margin-bottom:12px;">
     <button class="btn-nav" onclick="irVoltarTela1()">← VOLTAR</button>
-    <span style="font-weight:bold; color:var(--gold); font-size:13px; text-transform:uppercase; letter-spacing:1px;">CONVOCAÇÃO</span>
+    <span style="font-weight:bold;color:var(--gold);font-size:13px;text-transform:uppercase;letter-spacing:1px;">CONVOCAÇÃO</span>
     <div style="width:60px;"></div>
   </div>
   <div class="card">
@@ -616,11 +586,11 @@ textarea { height: auto; padding: 12px; resize: none; }
       <div class="status-container">
         <div class="status-box">
           <div class="status-label"><span style="color:var(--neon)">CONFIRMADOS</span><span id="percentConf">0%</span></div>
-          <div class="bar-bg"><div id="barConf" class="bar-fill" style="width:0%; background:var(--neon);"></div></div>
+          <div class="bar-bg"><div id="barConf" class="bar-fill" style="width:0%;background:var(--neon);"></div></div>
         </div>
         <div class="status-box">
           <div class="status-label"><span style="color:var(--gold)">ESPERA</span><span id="countEsp">(0)</span></div>
-          <div class="bar-bg"><div id="barEsp" class="bar-fill" style="width:0%; background:var(--gold);"></div></div>
+          <div class="bar-bg"><div id="barEsp" class="bar-fill" style="width:0%;background:var(--gold);"></div></div>
         </div>
       </div>
       <div class="search-box">
@@ -646,18 +616,18 @@ textarea { height: auto; padding: 12px; resize: none; }
     <div id="screen-3" class="screen active">
       <div class="header-nav">
         <button class="btn-nav" onclick="irParaTela(2)">← VOLTAR</button>
-        <span style="font-weight:bold; color:var(--gold)">JOGO ATUAL</span>
+        <span style="font-weight:bold;color:var(--gold)">JOGO ATUAL</span>
         <div style="width:50px;"></div>
       </div>
       <div class="clock" id="timer">10:00</div>
       <div class="controls">
         <button class="btn-c" onclick="startT()">▶</button>
         <button class="btn-c" onclick="pauseT()">Ⅱ</button>
-        <button class="btn-c" onclick="pedirConfirmacao('Resetar tempo?', resetT)">↺</button>
+        <button class="btn-c" onclick="pedirConfirmacao('Resetar tempo?',resetT)">↺</button>
       </div>
       <div class="scoreboard">
-        <div class="score-box" style="border-color:var(--blue); color:var(--blue)" id="s-azul">0</div>
-        <div class="score-box" style="border-color:var(--red); color:var(--red)" id="s-red">0</div>
+        <div class="score-box" style="border-color:var(--blue);color:var(--blue)" id="s-azul">0</div>
+        <div class="score-box" style="border-color:var(--red);color:var(--red)" id="s-red">0</div>
       </div>
       <div class="field" id="field"></div>
       <div class="logs-container">
@@ -665,14 +635,14 @@ textarea { height: auto; padding: 12px; resize: none; }
         <div><div class="log-header" style="color:var(--red)">RED LOG</div><div id="l-red"></div></div>
       </div>
       <div class="outcome-row">
-        <button class="btn-out" style="border-color:var(--blue); color:var(--blue)" onclick="pedirConfirmacao('Vitória do Time Azul?', () => processarFim('azul'))">VITÓRIA AZUL</button>
-        <button class="btn-out" style="border-color:var(--red); color:var(--red)" onclick="pedirConfirmacao('Vitória do Time Red?', () => processarFim('red'))">VITÓRIA RED</button>
-        <button class="btn-out" onclick="pedirConfirmacao('Empate?', () => processarFim('empate'))">EMPATE</button>
+        <button class="btn-out" style="border-color:var(--blue);color:var(--blue)" onclick="pedirConfirmacao('Vitória do Time Azul?',()=>processarFim('azul'))">VITÓRIA AZUL</button>
+        <button class="btn-out" style="border-color:var(--red);color:var(--red)" onclick="pedirConfirmacao('Vitória do Time Red?',()=>processarFim('red'))">VITÓRIA RED</button>
+        <button class="btn-out" onclick="pedirConfirmacao('Empate?',()=>processarFim('empate'))">EMPATE</button>
       </div>
       <div class="fila-box">
         <div class="fila-header">
-          <span style="color:var(--neon); font-weight:900; font-size:11px">PRÓXIMOS (FILA)</span>
-          <button onclick="abrirEditorFila()" style="background:none; border:1px solid var(--gold); color:var(--gold); font-size:9px; padding:3px 7px; border-radius:5px;">EDITAR FILA 🖊️</button>
+          <span style="color:var(--neon);font-weight:900;font-size:11px">PRÓXIMOS (FILA)</span>
+          <button onclick="abrirEditorFila()" style="background:none;border:1px solid var(--gold);color:var(--gold);font-size:9px;padding:3px 7px;border-radius:5px;">EDITAR FILA 🖊️</button>
         </div>
         <div class="next-list" id="fila-lista"></div>
       </div>
@@ -686,12 +656,10 @@ textarea { height: auto; padding: 12px; resize: none; }
         <tbody id="r-body"></tbody>
       </table>
     </div>
-
-    <!-- SCREEN 4: RELATÓRIO FINAL -->
     <div id="screen-4" class="screen">
       <div class="header-nav">
         <button class="btn-nav" onclick="irParaTela(3)">← VOLTAR</button>
-        <span style="font-weight:bold; color:var(--gold)">RESUMO FINAL</span>
+        <span style="font-weight:bold;color:var(--gold)">RESUMO FINAL</span>
         <div style="width:50px;"></div>
       </div>
       <div class="screen-container" id="capture">
@@ -700,7 +668,7 @@ textarea { height: auto; padding: 12px; resize: none; }
           <div class="report-bar">MATCH DAY REPORT</div>
           <div class="stats-total">TOTAL GOLS: <span id="report-total-gols">--</span> | TOTAL ATLETAS: <span id="report-total-atletas">--</span></div>
         </div>
-        <div class="event-info-bar" id="report-event-info">
+        <div class="event-info-bar">
           <div class="ei-item"><div class="ei-label">Pelada</div><div class="ei-value" id="ei-nome">--</div></div>
           <div class="ei-item"><div class="ei-label">Data</div><div class="ei-value" id="ei-data">--</div></div>
           <div class="ei-item"><div class="ei-label">Horário</div><div class="ei-value" id="ei-hora">--</div></div>
@@ -709,31 +677,29 @@ textarea { height: auto; padding: 12px; resize: none; }
         <div class="field-view" id="field-view-4">
           <svg class="pitch-svg" viewBox="0 0 100 148" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="100" height="148" fill="#1e4d1a"/>
-            <rect x="0" y="0" width="100" height="14.8" fill="#224f1e"/>
-            <rect x="0" y="29.6" width="100" height="14.8" fill="#224f1e"/>
-            <rect x="0" y="59.2" width="100" height="14.8" fill="#224f1e"/>
-            <rect x="0" y="88.8" width="100" height="14.8" fill="#224f1e"/>
+            <rect x="0" y="0" width="100" height="14.8" fill="#224f1e"/><rect x="0" y="29.6" width="100" height="14.8" fill="#224f1e"/>
+            <rect x="0" y="59.2" width="100" height="14.8" fill="#224f1e"/><rect x="0" y="88.8" width="100" height="14.8" fill="#224f1e"/>
             <rect x="0" y="118.4" width="100" height="14.8" fill="#224f1e"/>
-            <rect x="4" y="4" width="92" height="140" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.2"/>
-            <line x1="4" y1="74" x2="96" y2="74" stroke="rgba(255,255,255,0.85)" stroke-width="1"/>
-            <circle cx="50" cy="74" r="12" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1"/>
-            <circle cx="50" cy="74" r="1" fill="rgba(255,255,255,0.7)"/>
-            <rect x="24" y="4" width="52" height="27" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
-            <rect x="37" y="4" width="26" height="10" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
-            <rect x="42" y="1.5" width="16" height="4" rx="1" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.95)" stroke-width="1.4"/>
-            <circle cx="50" cy="20" r="0.9" fill="rgba(255,255,255,0.8)"/>
-            <path d="M30,31 A12,12 0 0,0 70,31" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.9"/>
-            <rect x="24" y="117" width="52" height="27" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
-            <rect x="37" y="134" width="26" height="10" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
-            <rect x="42" y="142.5" width="16" height="4" rx="1" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.95)" stroke-width="1.4"/>
-            <circle cx="50" cy="128" r="0.9" fill="rgba(255,255,255,0.8)"/>
-            <path d="M30,117 A12,12 0 0,1 70,117" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.9"/>
-            <path d="M4,8 A4,4 0 0,0 8,4" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
-            <path d="M92,4 A4,4 0 0,0 96,8" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
-            <path d="M4,140 A4,4 0 0,1 8,144" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
-            <path d="M96,140 A4,4 0 0,1 92,144" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
+            <rect x="4" y="4" width="92" height="140" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1.2"/>
+            <line x1="4" y1="74" x2="96" y2="74" stroke="rgba(255,255,255,.85)" stroke-width="1"/>
+            <circle cx="50" cy="74" r="12" fill="none" stroke="rgba(255,255,255,.85)" stroke-width="1"/>
+            <circle cx="50" cy="74" r="1" fill="rgba(255,255,255,.7)"/>
+            <rect x="24" y="4" width="52" height="27" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1"/>
+            <rect x="37" y="4" width="26" height="10" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1"/>
+            <rect x="42" y="1.5" width="16" height="4" rx="1" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.95)" stroke-width="1.4"/>
+            <circle cx="50" cy="20" r=".9" fill="rgba(255,255,255,.8)"/>
+            <path d="M30,31 A12,12 0 0,0 70,31" fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".9"/>
+            <rect x="24" y="117" width="52" height="27" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1"/>
+            <rect x="37" y="134" width="26" height="10" fill="none" stroke="rgba(255,255,255,.8)" stroke-width="1"/>
+            <rect x="42" y="142.5" width="16" height="4" rx="1" fill="rgba(255,255,255,.15)" stroke="rgba(255,255,255,.95)" stroke-width="1.4"/>
+            <circle cx="50" cy="128" r=".9" fill="rgba(255,255,255,.8)"/>
+            <path d="M30,117 A12,12 0 0,1 70,117" fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".9"/>
+            <path d="M4,8 A4,4 0 0,0 8,4" fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".8"/>
+            <path d="M92,4 A4,4 0 0,0 96,8" fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".8"/>
+            <path d="M4,140 A4,4 0 0,1 8,144" fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".8"/>
+            <path d="M96,140 A4,4 0 0,1 92,144" fill="none" stroke="rgba(255,255,255,.6)" stroke-width=".8"/>
           </svg>
-          <div id="lineup-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
+          <div id="lineup-overlay" style="position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;"></div>
         </div>
         <div class="formation-label" id="formation-label">⚽ ESCALAÇÃO TÁTICA</div>
         <div class="mvp-wrapper">
@@ -745,10 +711,7 @@ textarea { height: auto; padding: 12px; resize: none; }
           <div class="results-title">🏆 Classificação Final</div>
           <div id="report-ranking"></div>
         </div>
-        <div class="presence-box">
-          <strong>Lista de Presença:</strong><br>
-          <span id="report-presence">--</span>
-        </div>
+        <div class="presence-box"><strong>Lista de Presença:</strong><br><span id="report-presence">--</span></div>
         <div class="t4-footer"><div>Arena Fut PRO V2</div></div>
       </div>
       <button class="btn-share" onclick="shareReport()">COMPARTILHAR RESULTADO</button>
@@ -757,592 +720,736 @@ textarea { height: auto; padding: 12px; resize: none; }
   </div>
 </div>
 
-<!-- ===== MODAIS ===== -->
+<!-- ===== MODAIS EXISTENTES ===== -->
 <div id="modal-confirm" class="modal">
   <div class="m-content" style="text-align:center;">
     <h4 id="confirm-msg" style="color:#fff;">Tem certeza?</h4>
-    <div style="display:flex; gap:10px; justify-content:center;">
+    <div style="display:flex;gap:10px;justify-content:center;">
       <button class="btn-confirm" style="background:#555;" onclick="document.getElementById('modal-confirm').style.display='none'">NÃO</button>
-      <button class="btn-confirm" style="background:var(--neon); color:#000;" id="btn-sim">SIM</button>
+      <button class="btn-confirm" style="background:var(--neon);color:#000;" id="btn-sim">SIM</button>
     </div>
   </div>
 </div>
 <div id="modal-assist" class="modal">
   <div class="m-content" style="border-color:var(--neon);">
-    <h4 style="text-align:center; margin-top:0">Quem deu o passe? 👟</h4>
+    <h4 style="text-align:center;margin-top:0">Quem deu o passe? 👟</h4>
     <div id="opts"></div>
-    <button onclick="gol(null)" style="width:100%; padding:15px; background:#111; color:#666; border:none; border-radius:10px; margin-top:10px;">GOL INDIVIDUAL</button>
+    <button onclick="gol(null)" style="width:100%;padding:15px;background:#111;color:#666;border:none;border-radius:10px;margin-top:10px;">GOL INDIVIDUAL</button>
   </div>
 </div>
 <div id="modal-fila" class="modal">
   <div class="m-content">
-    <h4 style="text-align:center; margin-top:0; color:var(--gold);">Reordenar Fila 📋</h4>
+    <h4 style="text-align:center;margin-top:0;color:var(--gold);">Reordenar Fila 📋</h4>
     <div id="fila-editor-container"></div>
-    <div style="display:flex; gap:10px; margin-top:15px;">
-      <button onclick="fecharFila(false)" style="flex:1; padding:15px; background:#444; color:#fff; border:none; border-radius:10px;">CANCELAR</button>
-      <button onclick="fecharFila(true)" style="flex:1; padding:15px; background:var(--gold); color:#000; font-weight:bold; border:none; border-radius:10px;">SALVAR</button>
+    <div style="display:flex;gap:10px;margin-top:15px;">
+      <button onclick="fecharFila(false)" style="flex:1;padding:15px;background:#444;color:#fff;border:none;border-radius:10px;">CANCELAR</button>
+      <button onclick="fecharFila(true)" style="flex:1;padding:15px;background:var(--gold);color:#000;font-weight:bold;border:none;border-radius:10px;">SALVAR</button>
     </div>
   </div>
 </div>
 <div id="modal-sub" class="modal">
-  <div class="m-content" style="border-color: var(--gold);">
-    <h4 style="text-align:center; margin-top:0; color:var(--gold);">Substituição ↔️</h4>
+  <div class="m-content" style="border-color:var(--gold);">
+    <h4 style="text-align:center;margin-top:0;color:var(--gold);">Substituição ↔️</h4>
     <div class="sub-info-box">Jogador saindo: <strong id="sub-out-label">—</strong></div>
     <div class="sub-section-label">Quem entra da fila?</div>
     <div id="sub-in-lista"></div>
     <label class="sub-check-label">
       <input type="checkbox" id="sub-definitiva">
-      <span>Jogador entra de forma definitiva<br><span style="color:#666; font-size:10px;">(sai permanentemente da lista de próxima)</span></span>
+      <span>Jogador entra de forma definitiva<br><span style="color:#666;font-size:10px;">(sai permanentemente da lista de próxima)</span></span>
     </label>
-    <div style="display:flex; gap:10px; margin-top:4px;">
-      <button onclick="fecharSub()" style="flex:1; padding:13px; background:#333; color:#fff; border:none; border-radius:10px; font-weight:bold; font-size:12px;">CANCELAR</button>
-      <button onclick="confirmarSub()" style="flex:1; padding:13px; background:var(--gold); color:#000; border:none; border-radius:10px; font-weight:bold; font-size:12px;">CONFIRMAR</button>
+    <div style="display:flex;gap:10px;margin-top:4px;">
+      <button onclick="fecharSub()" style="flex:1;padding:13px;background:#333;color:#fff;border:none;border-radius:10px;font-weight:bold;font-size:12px;">CANCELAR</button>
+      <button onclick="confirmarSub()" style="flex:1;padding:13px;background:var(--gold);color:#000;border:none;border-radius:10px;font-weight:bold;font-size:12px;">CONFIRMAR</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NOVOS MODAIS ===== -->
+
+<!-- Modal: Pelada criada com link de convite -->
+<div id="modal-pelada-criada" class="modal">
+  <div class="m-content">
+    <h4 style="text-align:center;margin-top:0;color:var(--neon);">🎉 Pelada Criada!</h4>
+    <p style="text-align:center;font-size:12px;color:#888;margin-bottom:16px;">Compartilhe este link com os jogadores:</p>
+    <div class="link-box" id="link-convite-box" onclick="copiarLinkConvite()">Gerando link...</div>
+    <p style="text-align:center;font-size:10px;color:#555;margin-top:-6px;margin-bottom:14px;">Toque no link para copiar</p>
+    <div class="share-btns-grid">
+      <button class="btn-wapp-share" onclick="compartilharConviteWhatsApp()">📱 WhatsApp</button>
+      <button class="btn-copy-link" onclick="copiarLinkConvite()">📋 Copiar Link</button>
+    </div>
+    <div style="display:flex;gap:10px;margin-top:12px;">
+      <button onclick="document.getElementById('modal-pelada-criada').style.display='none';irTela2();" style="flex:1;padding:13px;background:var(--gold);color:#000;border:none;border-radius:12px;font-weight:900;font-size:12px;">IR PARA CONVOCAÇÃO →</button>
+    </div>
+    <button onclick="document.getElementById('modal-pelada-criada').style.display='none'" style="width:100%;margin-top:8px;padding:10px;background:transparent;border:1px solid #333;color:#555;border-radius:10px;font-size:11px;text-transform:none;">Fechar</button>
+  </div>
+</div>
+
+<!-- Modal: Nome do convidado -->
+<div id="modal-nome-convidado" class="modal" style="z-index:999999;">
+  <div class="m-content">
+    <div class="modal-nome-wrapper">
+      <h4>Qual é o seu nome? 👋</h4>
+      <p>Para confirmar sua presença, precisamos saber quem é você!</p>
+      <input type="text" id="input-nome-convidado" placeholder="Digite seu nome completo" maxlength="40" onkeypress="if(event.key==='Enter')executarConfirmacaoConvite()">
+      <div style="display:flex;gap:10px;">
+        <button onclick="document.getElementById('modal-nome-convidado').style.display='none'" style="flex:1;padding:13px;background:#333;color:#fff;border:none;border-radius:12px;font-weight:bold;">CANCELAR</button>
+        <button onclick="executarConfirmacaoConvite()" style="flex:2;padding:13px;background:linear-gradient(135deg,#00cc6a,var(--neon));color:#000;border:none;border-radius:12px;font-weight:900;font-size:13px;">CONFIRMAR ✅</button>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
 /* =============================================
-   FIREBASE CONFIG
-   ⚠️  Substitua pelos dados do SEU projeto no
-       Firebase Console → Configurações → Web App
+   FIREBASE CONFIG — CREDENCIAIS REAIS
    ============================================= */
 const firebaseConfig = {
-  apiKey:            "SUA_API_KEY_AQUI",
-  authDomain:        "SEU_PROJETO.firebaseapp.com",
-  projectId:         "SEU_PROJETO",
-  storageBucket:     "SEU_PROJETO.appspot.com",
-  messagingSenderId: "SEU_SENDER_ID",
-  appId:             "SEU_APP_ID"
+  apiKey:            "AIzaSyCwi7wNRm-0Zg8W1sXVOFy-1EnGHjXyUCg",
+  authDomain:        "arena-fut-f1599.firebaseapp.com",
+  databaseURL:       "https://arena-fut-f1599-default-rtdb.firebaseio.com",
+  projectId:         "arena-fut-f1599",
+  storageBucket:     "arena-fut-f1599.firebasestorage.app",
+  messagingSenderId: "835218567459",
+  appId:             "1:835218567459:web:8ff9a673cc523f6e7b9c96",
+  measurementId:     "G-LTT2WMZ0LF"
 };
 
-let firebaseReady = false;
-let auth = null;
-
+let auth = null, db = null;
 try {
   firebase.initializeApp(firebaseConfig);
   auth = firebase.auth();
-  firebaseReady = true;
+  db   = firebase.firestore();
+  console.log('✅ Firebase inicializado com sucesso!');
 } catch(e) {
-  console.warn('Firebase não configurado — modo offline ativo.', e.message);
+  console.warn('⚠️ Firebase não inicializou:', e.message);
 }
 
 /* =============================================
-   TELA 0 — PWA INSTALL LOGIC
+   VARIÁVEIS DO MODO CONVITE
    ============================================= */
-let deferredInstallPrompt = null;
+const CONVITE_ID = new URLSearchParams(window.location.search).get('pelada');
+let _conviteUnsub    = null;   // Firestore listener unsubscribe
+let _meuUid          = null;
+let _meuNome         = null;
+let _conviteData     = null;   // dados do documento Firestore
+let _contdownTimer   = null;
+let _linkConviteURL  = '';
 
-// Captura o evento "beforeinstallprompt" (Chrome/Android)
-window.addEventListener('beforeinstallprompt', (e) => {
-  e.preventDefault();
-  deferredInstallPrompt = e;
-  // Mostra botão de instalar
-  const btn = document.getElementById('btn-install-pwa');
-  const sub = document.getElementById('install-sub-text');
-  if (btn) { btn.classList.remove('hidden'); }
-  if (sub) { sub.style.display = 'block'; }
-});
-
-// Detecta iOS Safari
-function isIOS() {
-  return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
-}
-function isInStandaloneMode() {
-  return ('standalone' in window.navigator) && window.navigator.standalone;
-}
-
-function instalarPWA() {
-  if (deferredInstallPrompt) {
-    // Android / Chrome Desktop
-    deferredInstallPrompt.prompt();
-    deferredInstallPrompt.userChoice.then((result) => {
-      deferredInstallPrompt = null;
-      if (result.outcome === 'accepted') {
-        document.getElementById('btn-install-pwa').classList.add('hidden');
-        document.getElementById('install-sub-text').style.display = 'none';
-      }
-    });
-  } else if (isIOS()) {
-    // iOS — mostra dica manual
-    const tip = document.getElementById('ios-tip');
-    if (tip) { tip.classList.toggle('show'); }
-  }
-}
-
-// Ao carregar: verifica iOS
+/* =============================================
+   INICIALIZAÇÃO — DETECTA MODO
+   ============================================= */
 window.addEventListener('load', () => {
-  if (isIOS() && !isInStandaloneMode()) {
-    const btn = document.getElementById('btn-install-pwa');
-    const sub = document.getElementById('install-sub-text');
-    if (btn) {
-      btn.classList.remove('hidden');
-      document.getElementById('install-btn-text').innerText = 'Adicionar à Tela Inicial';
-    }
-    if (sub) { sub.style.display = 'block'; }
-  }
-  // Se já está instalado (standalone), pula tela 0
-  if (isInStandaloneMode()) {
-    entrarSemLogin();
-  }
-});
-
-/* =============================================
-   TELA 0 — GOOGLE LOGIN
-   ============================================= */
-function loginGoogle() {
-  if (!firebaseReady || !auth) {
-    // Firebase não configurado: entra direto
-    entrarComNome('Craque');
+  if (CONVITE_ID) {
+    // MODO CONVITE: oculta tudo e mostra página de convite
+    document.getElementById('tela0').style.display = 'none';
+    document.getElementById('tela1').classList.add('hidden');
+    document.getElementById('tela2').classList.add('hidden');
+    document.getElementById('tela3').style.display  = 'none';
+    document.getElementById('pagina-convite').style.display = 'block';
+    inicializarPaginaConvite(CONVITE_ID);
     return;
   }
+
+  // MODO NORMAL: lógica existente
+  const ios = isIOS();
+  const stand = isInStandaloneMode();
+  if (ios && !stand) {
+    document.getElementById('btn-install-pwa').classList.remove('hidden');
+    document.getElementById('install-btn-text').innerText = 'Adicionar à Tela Inicial';
+  }
+  if (stand) entrarSemLogin();
+});
+
+/* =============================================
+   PWA INSTALL
+   ============================================= */
+let deferredInstallPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault(); deferredInstallPrompt = e;
+  document.getElementById('btn-install-pwa').classList.remove('hidden');
+});
+window.addEventListener('appinstalled', () => {
+  document.getElementById('btn-install-pwa').classList.add('hidden');
+  deferredInstallPrompt = null;
+});
+function isIOS() { return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream; }
+function isInStandaloneMode() { return ('standalone' in navigator) && navigator.standalone; }
+function instalarPWA() {
+  if (deferredInstallPrompt) {
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then(r => { if(r.outcome==='accepted') document.getElementById('btn-install-pwa').classList.add('hidden'); });
+  } else if (isIOS()) {
+    document.getElementById('ios-tip').classList.toggle('show');
+  }
+}
+
+/* =============================================
+   GOOGLE LOGIN (MODO NORMAL)
+   ============================================= */
+const frasesGestor = [
+  "Fala, Capitão! Já cobrou o PIX de quem disse que 'ia ver e avisava'?",
+  "Bem-vindo, Presida. Preparado para ouvir que o gol foi de banheira o jogo todo?",
+  "E aí, Meu 10! Quem vai ser o primeiro a pedir pra sair com 2 minutos?",
+  "Capitão, hoje é dia de expulsar quem trouxer chuteira de cravo pro Society!",
+  "Presida na área! Hoje o árbitro é você… e já sabe como termina isso. 😂",
+  "Boa tarde, Chefão! A resenha não começa sem você.",
+  "Capitão presente! O campo já tá te esperando — e o grupo do Zap também. 📱"
+];
+function loginGoogle() {
+  if (!auth) { entrarComNome('Capitão'); return; }
   const btn = document.getElementById('btn-google-login');
   btn.classList.add('loading');
-
   const provider = new firebase.auth.GoogleAuthProvider();
   auth.signInWithPopup(provider)
-    .then((result) => {
-      const user   = result.user;
-      const nome   = user.displayName ? user.displayName.split(' ')[0] : 'Craque';
+    .then(r => {
       btn.classList.remove('loading');
-      entrarComNome(nome);
+      entrarComNome(r.user.displayName ? r.user.displayName.split(' ')[0] : 'Capitão');
     })
-    .catch((err) => {
-      btn.classList.remove('loading');
-      console.warn('Erro no login:', err.message);
-      // Se o usuário fechou o popup, não mostra erro — só mantém na tela
-    });
+    .catch(e => { btn.classList.remove('loading'); console.warn(e.message); });
 }
-
 function entrarComNome(nome) {
-  // Personaliza a saudação com o primeiro nome do usuário
-  const saudacoes = [
-    `Fala, ${nome}! Já cobrou o PIX de quem disse que 'ia ver e avisava'?`,
-    `Bem-vindo, ${nome}! Preparado para ouvir que o gol foi de banheira o jogo todo?`,
-    `${nome} na área! Vai escalar ou vai deixar o favoritismo decidir?`,
-    `Chegou o craque ${nome}! Boa sorte explicar a escalação pro time perdedor!`,
-    `E aí, ${nome}! Hoje o árbitro é você… e já sabe como termina isso. 😂`
-  ];
-  window._saudacaoPersonalizada = saudacoes[Math.floor(Math.random() * saudacoes.length)];
-  mostrarToast(`⚽ Bem-vindo, ${nome}! É nóis!`);
+  const f = [`Fala, ${nome}! Vai escalar ou vai deixar o favoritismo decidir?`,`E aí, ${nome}! Já cobrou o PIX de todo mundo?`,`${nome} chegou! A resenha pode começar. ⚽`];
+  window._saudacaoPersonalizada = f[Math.floor(Math.random()*f.length)];
+  mostrarToast(`⚽ Bem-vindo, ${nome}!`);
   setTimeout(irParaApp, 1200);
 }
-
-function entrarSemLogin() {
-  window._saudacaoPersonalizada = null;
-  irParaApp();
-}
-
+function entrarSemLogin() { window._saudacaoPersonalizada = null; irParaApp(); }
 function irParaApp() {
-  const tela0 = document.getElementById('tela0');
-  tela0.style.transition = 'opacity 0.4s ease';
-  tela0.style.opacity = '0';
+  const t0 = document.getElementById('tela0');
+  t0.style.transition = 'opacity .4s'; t0.style.opacity = '0';
   setTimeout(() => {
-    tela0.style.display = 'none';
+    t0.style.display = 'none';
     document.getElementById('tela1').classList.remove('hidden');
-    definirSaudacao();
+    document.getElementById('txt-saudacao').innerText =
+      window._saudacaoPersonalizada || frasesGestor[Math.floor(Math.random()*frasesGestor.length)];
   }, 380);
 }
-
 function mostrarToast(msg) {
   const t = document.getElementById('t0-toast');
-  t.innerText = msg;
-  t.classList.add('show');
+  t.innerText = msg; t.classList.add('show');
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
 /* =============================================
-   ESTADO GLOBAL
+   ESTADO GLOBAL (JOGO)
    ============================================= */
 const estado = {
-  config: { jogadoresPorTime: 5, tempoSecs: 600 },
-  atletasApp: [], contadorOrdem: 0,
-  atletas: [], fila: [], filaTemp: [],
-  sAzul: 0, sRed: 0, segs: 600, tId: null, autor: null
+  config: { jogadoresPorTime:5, tempoSecs:600 },
+  atletasApp:[], contadorOrdem:0,
+  atletas:[], fila:[], filaTemp:[],
+  sAzul:0, sRed:0, segs:600, tId:null, autor:null
 };
-
-const frasesGestorGenericas = [
-  "Fala, Capitão! Já cobrou o PIX de quem disse que 'ia ver e avisava'?",
-  "Bem-vindo, Presida. Preparado para ouvir que o gol foi de banheira o jogo todo?",
-  "E aí, Meu 10! Já sabe quem vai ser o primeiro a pedir pra sair com 2 minutos?",
-  "Capitão, hoje é dia de expulsar quem trouxer chuteira de cravo pro Society!",
-  "Fala, Presida! Se o time do colete perder de novo, a culpa é sua, hein?",
-  "Chegou o Meu 10! Vai escalar ou vai deixar o favoritismo decidir?",
-  "Aqui chegou o Capitão. Boa sorte explicar a escalação pro time perdedor!",
-  "Presida na área! Hoje o árbitro é você… e já sabe como termina isso."
-];
-
-function definirSaudacao() {
-  const txt = window._saudacaoPersonalizada ||
-    frasesGestorGenericas[Math.floor(Math.random() * frasesGestorGenericas.length)];
-  document.getElementById('txt-saudacao').innerText = txt;
-}
 
 /* =============================================
    NAVEGAÇÃO
    ============================================= */
-function irTela2() {
-  document.getElementById('tela1').classList.add('hidden');
-  document.getElementById('tela2').classList.remove('hidden');
-}
-function irVoltarTela1() {
-  document.getElementById('tela2').classList.add('hidden');
-  document.getElementById('tela1').classList.remove('hidden');
-}
+function irTela2() { document.getElementById('tela1').classList.add('hidden'); document.getElementById('tela2').classList.remove('hidden'); }
+function irVoltarTela1() { document.getElementById('tela2').classList.add('hidden'); document.getElementById('tela1').classList.remove('hidden'); }
 function irTela3() {
   iniciarPartida();
   document.getElementById('tela1').classList.add('hidden');
   document.getElementById('tela2').classList.add('hidden');
   document.getElementById('tela3').classList.remove('hidden');
   document.getElementById('tela3').classList.add('active');
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
   document.getElementById('screen-3').classList.add('active');
   render();
 }
-function irVoltarTela2() {
-  pauseT();
-  document.getElementById('tela3').classList.remove('active');
-  document.getElementById('tela2').classList.remove('hidden');
-}
+function irVoltarTela2() { pauseT(); document.getElementById('tela3').classList.remove('active'); document.getElementById('tela2').classList.remove('hidden'); }
 function irParaTela(n) {
-  if (n === 2) { irVoltarTela2(); return; }
-  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-  document.getElementById('screen-' + n).classList.add('active');
-  if (n === 4) populateReport();
+  if (n===2) { irVoltarTela2(); return; }
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+n).classList.add('active');
+  if (n===4) populateReport();
   render();
 }
 
 /* =============================================
-   LÓGICA DO JOGO
+   LÓGICA DO JOGO (EXISTENTE)
    ============================================= */
 function iniciarPartida() {
-  estado.config.jogadoresPorTime = parseInt(document.getElementById('jogadoresPorTime').value) || 5;
-  const tempoMin = parseInt(document.getElementById('tempoRegra').value) || 10;
-  estado.config.tempoSecs = tempoMin * 60;
+  estado.config.jogadoresPorTime = parseInt(document.getElementById('jogadoresPorTime').value)||5;
+  const tempoMin = parseInt(document.getElementById('tempoRegra').value)||10;
+  estado.config.tempoSecs = tempoMin*60;
   const n = estado.config.jogadoresPorTime;
-  const confirmados = estado.atletasApp
-    .filter(a => a.confirmado && a.ordemConfirmacao != null)
-    .sort((a, b) => a.ordemConfirmacao - b.ordemConfirmacao);
-  estado.atletas = confirmados.map((a, i) => ({
-    n: a.nome, v: 0, g: 0, a: 0,
-    t: (i < n) ? 'azul' : ((i < 2 * n) ? 'red' : null),
-    active: (i < 2 * n)
-  }));
-  estado.fila = confirmados.slice(2 * n).map(a => a.nome);
-  estado.sAzul = 0; estado.sRed = 0;
-  estado.segs = estado.config.tempoSecs;
-  estado.autor = null;
+  const confirmados = estado.atletasApp.filter(a=>a.confirmado&&a.ordemConfirmacao!=null).sort((a,b)=>a.ordemConfirmacao-b.ordemConfirmacao);
+  estado.atletas = confirmados.map((a,i)=>({n:a.nome,v:0,g:0,a:0,t:(i<n)?'azul':((i<2*n)?'red':null),active:(i<2*n)}));
+  estado.fila = confirmados.slice(2*n).map(a=>a.nome);
+  estado.sAzul=0; estado.sRed=0; estado.segs=estado.config.tempoSecs; estado.autor=null;
   pauseT();
-  document.getElementById('s-azul').innerText = 0;
-  document.getElementById('s-red').innerText = 0;
-  document.getElementById('l-azul').innerHTML = '';
-  document.getElementById('l-red').innerHTML = '';
+  document.getElementById('s-azul').innerText=0; document.getElementById('s-red').innerText=0;
+  document.getElementById('l-azul').innerHTML=''; document.getElementById('l-red').innerHTML='';
   atualizarDisplayTimer();
 }
-function toggleCheck(id) {
-  const a = estado.atletasApp[id];
-  if (!a.confirmado) { a.confirmado = true; a.ordemConfirmacao = ++estado.contadorOrdem; }
-  else { a.confirmado = false; a.ordemConfirmacao = null; }
-  renderizarLista();
-}
-function marcarTodos(status) {
-  estado.contadorOrdem = 0;
-  if (status) { estado.atletasApp.forEach(a => { a.confirmado = true; a.ordemConfirmacao = ++estado.contadorOrdem; }); }
-  else { estado.atletasApp.forEach(a => { a.confirmado = false; a.ordemConfirmacao = null; }); }
-  renderizarLista();
-}
+function toggleCheck(id) { const a=estado.atletasApp[id]; if(!a.confirmado){a.confirmado=true;a.ordemConfirmacao=++estado.contadorOrdem;}else{a.confirmado=false;a.ordemConfirmacao=null;} renderizarLista(); }
+function marcarTodos(status) { estado.contadorOrdem=0; if(status)estado.atletasApp.forEach(a=>{a.confirmado=true;a.ordemConfirmacao=++estado.contadorOrdem;}); else estado.atletasApp.forEach(a=>{a.confirmado=false;a.ordemConfirmacao=null;}); renderizarLista(); }
 function processarLista() {
-  const texto = document.getElementById('listaTexto').value;
-  const linhas = texto.split('\n').filter(l => l.trim() !== '');
-  const limiteMax = parseInt(document.getElementById('limite').value) || 999;
-  estado.contadorOrdem = 0;
-  estado.atletasApp = linhas.map((linha, index) => {
-    const cat = linha.toUpperCase().includes('MENSALISTA') ? 'MENSALISTA' : 'CONVIDADO';
-    const confirmado = (index < limiteMax);
-    const ordemConfirmacao = confirmado ? ++estado.contadorOrdem : null;
-    return { id: index, nome: linha.replace(/^\d+[\s.-]*/, '').trim(), cat, stars: 3, pos: 'A', img: '👟', confirmado, ordemConfirmacao };
+  const texto=document.getElementById('listaTexto').value;
+  const linhas=texto.split('\n').filter(l=>l.trim()!=='');
+  const limiteMax=parseInt(document.getElementById('limite').value)||999;
+  estado.contadorOrdem=0;
+  estado.atletasApp=linhas.map((linha,idx)=>{
+    const cat=linha.toUpperCase().includes('MENSALISTA')?'MENSALISTA':'CONVIDADO';
+    const confirmado=idx<limiteMax;
+    return{id:idx,nome:linha.replace(/^\d+[\s.-]*/,'').trim(),cat,stars:3,pos:'A',img:'👟',confirmado,ordemConfirmacao:confirmado?++estado.contadorOrdem:null};
   });
-  document.getElementById('listaArea').style.display = 'block';
-  renderizarLista();
+  document.getElementById('listaArea').style.display='block'; renderizarLista();
 }
 function renderizarLista() {
-  const container = document.getElementById('renderAtletas');
-  container.innerHTML = estado.atletasApp.map((atleta) => `
-    <div class="atleta-item" data-nome="${atleta.nome.toLowerCase()}">
-      <input type="checkbox" class="atleta-check" ${atleta.confirmado ? 'checked' : ''} onchange="toggleCheck(${atleta.id})">
-      <div style="min-width:40px; display:flex; align-items:center; justify-content:center; flex-shrink:0;">
-        <span style="font-size:14px; font-weight:900; color:${atleta.ordemConfirmacao ? 'var(--neon)' : '#444'};">
-          ${atleta.ordemConfirmacao || ''}
-        </span>
+  const container=document.getElementById('renderAtletas');
+  container.innerHTML=estado.atletasApp.map(a=>`
+    <div class="atleta-item" data-nome="${a.nome.toLowerCase()}">
+      <input type="checkbox" class="atleta-check" ${a.confirmado?'checked':''} onchange="toggleCheck(${a.id})">
+      <div style="min-width:40px;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+        <span style="font-size:14px;font-weight:900;color:${a.ordemConfirmacao?'var(--neon)':'#444'};">${a.ordemConfirmacao||''}</span>
       </div>
       <div class="atleta-avatar"><img src="https://www.w3schools.com/howto/img_avatar.png"></div>
       <div class="atleta-dados">
-        <span class="atleta-nome">${atleta.nome}</span>
-        <span class="tag ${atleta.cat === 'MENSALISTA' ? 'tag-mensalista' : 'tag-convidado'}" onclick="mudarCategoria(${atleta.id})">${atleta.cat}</span>
-        <div class="estrelas" onclick="mudarNivel(${atleta.id})">${'★'.repeat(atleta.stars)}${'☆'.repeat(5 - atleta.stars)}</div>
+        <span class="atleta-nome">${a.nome}</span>
+        <span class="tag ${a.cat==='MENSALISTA'?'tag-mensalista':'tag-convidado'}" onclick="mudarCategoria(${a.id})">${a.cat}</span>
+        <div class="estrelas" onclick="mudarNivel(${a.id})">${'★'.repeat(a.stars)}${'☆'.repeat(5-a.stars)}</div>
       </div>
-      <div class="pos-badge" onclick="alternarPosicao(${atleta.id})"><span>${atleta.img}</span><span>${atleta.pos}</span></div>
+      <div class="pos-badge" onclick="alternarPosicao(${a.id})"><span>${a.img}</span><span>${a.pos}</span></div>
     </div>`).join('');
   atualizarResumos();
 }
-function mudarCategoria(id) { estado.atletasApp[id].cat = estado.atletasApp[id].cat === 'MENSALISTA' ? 'CONVIDADO' : 'MENSALISTA'; renderizarLista(); }
-function mudarNivel(id) { estado.atletasApp[id].stars = (estado.atletasApp[id].stars % 5) + 1; renderizarLista(); }
-function alternarPosicao(id) {
-  if (estado.atletasApp[id].pos === 'A') { estado.atletasApp[id].pos = 'G'; estado.atletasApp[id].img = '🧤'; }
-  else { estado.atletasApp[id].pos = 'A'; estado.atletasApp[id].img = '👟'; }
-  renderizarLista();
+function mudarCategoria(id){estado.atletasApp[id].cat=estado.atletasApp[id].cat==='MENSALISTA'?'CONVIDADO':'MENSALISTA';renderizarLista();}
+function mudarNivel(id){estado.atletasApp[id].stars=(estado.atletasApp[id].stars%5)+1;renderizarLista();}
+function alternarPosicao(id){if(estado.atletasApp[id].pos==='A'){estado.atletasApp[id].pos='G';estado.atletasApp[id].img='🧤';}else{estado.atletasApp[id].pos='A';estado.atletasApp[id].img='👟';}renderizarLista();}
+function filtrarAtletas(){const b=document.getElementById('inputBusca').value.toLowerCase();document.querySelectorAll('.atleta-item').forEach(c=>{c.style.display=c.getAttribute('data-nome').includes(b)?'flex':'none';});}
+function atualizarResumos(){
+  const conf=estado.atletasApp.filter(a=>a.confirmado),esp=estado.atletasApp.filter(a=>!a.confirmado),tot=estado.atletasApp.length;
+  const gol=conf.filter(a=>a.pos==='G').length,pC=tot>0?Math.round(conf.length/tot*100):0,pE=tot>0?Math.round(esp.length/tot*100):0;
+  document.getElementById('percentConf').innerText=pC+'%';document.getElementById('barConf').style.width=pC+'%';
+  document.getElementById('countEsp').innerText=`(${esp.length})`;document.getElementById('barEsp').style.width=pE+'%';
+  document.getElementById('totalFooter').innerText=conf.length;document.getElementById('goleirosFooter').innerText=gol;
 }
-function filtrarAtletas() {
-  const busca = document.getElementById('inputBusca').value.toLowerCase();
-  document.querySelectorAll('.atleta-item').forEach(card => {
-    card.style.display = card.getAttribute('data-nome').includes(busca) ? 'flex' : 'none';
-  });
+function pedirConfirmacao(msg,cb){document.getElementById('confirm-msg').innerText=msg;document.getElementById('btn-sim').onclick=()=>{cb();document.getElementById('modal-confirm').style.display='none';};document.getElementById('modal-confirm').style.display='flex';}
+function processarFim(resultado){
+  if(resultado==='empate'){estado.atletas.filter(a=>a.active).forEach(a=>{estado.fila.push(a.n);a.active=false;a.t=null;});rodarFila('azul');rodarFila('red');resetPlacar();return;}
+  const v=resultado,p=resultado==='azul'?'red':'azul';
+  estado.atletas.filter(a=>a.t===v&&a.active).forEach(a=>a.v++);
+  estado.atletas.filter(a=>a.t===p&&a.active).forEach(a=>{estado.fila.push(a.n);a.active=false;a.t=null;});
+  rodarFila(p);resetPlacar();
 }
-function atualizarResumos() {
-  const confirmados = estado.atletasApp.filter(a => a.confirmado);
-  const espera = estado.atletasApp.filter(a => !a.confirmado);
-  const total = estado.atletasApp.length;
-  const goleiros = confirmados.filter(a => a.pos === 'G').length;
-  const percConf = total > 0 ? Math.round((confirmados.length / total) * 100) : 0;
-  const percEsp = total > 0 ? Math.round((espera.length / total) * 100) : 0;
-  document.getElementById('percentConf').innerText = percConf + '%';
-  document.getElementById('barConf').style.width = percConf + '%';
-  document.getElementById('countEsp').innerText = `(${espera.length})`;
-  document.getElementById('barEsp').style.width = percEsp + '%';
-  document.getElementById('totalFooter').innerText = confirmados.length;
-  document.getElementById('goleirosFooter').innerText = goleiros;
-}
-function pedirConfirmacao(msg, callback) {
-  document.getElementById('confirm-msg').innerText = msg;
-  document.getElementById('btn-sim').onclick = () => { callback(); document.getElementById('modal-confirm').style.display = 'none'; };
-  document.getElementById('modal-confirm').style.display = 'flex';
-}
-function processarFim(resultado) {
-  if (resultado === 'empate') {
-    estado.atletas.filter(a => a.active).forEach(a => { estado.fila.push(a.n); a.active = false; a.t = null; });
-    rodarFila('azul'); rodarFila('red'); resetPlacar(); return;
-  }
-  const vencedor = resultado;
-  const perdedor = resultado === 'azul' ? 'red' : 'azul';
-  estado.atletas.filter(a => a.t === vencedor && a.active).forEach(a => a.v++);
-  estado.atletas.filter(a => a.t === perdedor && a.active).forEach(a => { estado.fila.push(a.n); a.active = false; a.t = null; });
-  rodarFila(perdedor); resetPlacar();
-}
-function rodarFila(time) {
-  const n = estado.config.jogadoresPorTime;
-  for (let i = 0; i < n; i++) {
-    const nome = estado.fila.shift() || 'Vaga';
-    const player = estado.atletas.find(a => a.n === nome);
-    if (player) { player.active = true; player.t = time; }
-    else { estado.atletas.push({ n: nome, v: 0, g: 0, a: 0, t: time, active: true }); }
-  }
+function rodarFila(time){
+  const n=estado.config.jogadoresPorTime;
+  for(let i=0;i<n;i++){const nome=estado.fila.shift()||'Vaga';const p=estado.atletas.find(a=>a.n===nome);if(p){p.active=true;p.t=time;}else estado.atletas.push({n:nome,v:0,g:0,a:0,t:time,active:true});}
   render();
 }
-function render() {
-  const field = document.getElementById('field');
-  if (!field) return;
-  const buildRow = (a) =>
-    `<div class="row">
-       <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:90px;">${a.n}</span>
-       <div class="btn-actions">
-         <button class="btn-sub" onclick="abrirSub('${a.n}','${a.t}')">SUB</button>
-         <button class="btn-gol" onclick="abrAssist('${a.n}','${a.t}')">GOL</button>
-       </div>
-     </div>`;
-  field.innerHTML = `
-    <div class="team-card">
-      <div class="t-header" style="background:var(--blue)">TIME AZUL</div>
-      ${estado.atletas.filter(a => a.t === 'azul' && a.active).map(buildRow).join('')}
-    </div>
-    <div class="team-card">
-      <div class="t-header" style="background:var(--red)">TIME RED</div>
-      ${estado.atletas.filter(a => a.t === 'red' && a.active).map(buildRow).join('')}
-    </div>`;
-  const sorted = [...estado.atletas].sort((a, b) => { if (b.v !== a.v) return b.v - a.v; if (b.g !== a.g) return b.g - a.g; return b.a - a.a; });
-  document.getElementById('r-body').innerHTML = sorted.map(a => `<tr><td>${a.n}</td><td>${a.v}</td><td>${a.g}</td><td>${a.a}</td></tr>`).join('');
-  const n = estado.config.jogadoresPorTime;
-  let fText = '';
-  for (let i = 0; i < estado.fila.length; i += n) { fText += `TIME ${Math.floor(i / n) + 1}: [${estado.fila.slice(i, i + n).join(', ')}]<br>`; }
-  document.getElementById('fila-lista').innerHTML = fText || 'Fila vazia';
+function render(){
+  const field=document.getElementById('field');if(!field)return;
+  const buildRow=(a)=>`<div class="row"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:90px;">${a.n}</span><div class="btn-actions"><button class="btn-sub" onclick="abrirSub('${a.n.replace(/'/g,"\\'")}','${a.t}')">SUB</button><button class="btn-gol" onclick="abrAssist('${a.n.replace(/'/g,"\\'")}','${a.t}')">GOL</button></div></div>`;
+  field.innerHTML=`<div class="team-card"><div class="t-header" style="background:var(--blue)">TIME AZUL</div>${estado.atletas.filter(a=>a.t==='azul'&&a.active).map(buildRow).join('')}</div><div class="team-card"><div class="t-header" style="background:var(--red)">TIME RED</div>${estado.atletas.filter(a=>a.t==='red'&&a.active).map(buildRow).join('')}</div>`;
+  const sorted=[...estado.atletas].sort((a,b)=>{if(b.v!==a.v)return b.v-a.v;if(b.g!==a.g)return b.g-a.g;return b.a-a.a;});
+  document.getElementById('r-body').innerHTML=sorted.map(a=>`<tr><td>${a.n}</td><td>${a.v}</td><td>${a.g}</td><td>${a.a}</td></tr>`).join('');
+  const n=estado.config.jogadoresPorTime;let fText='';
+  for(let i=0;i<estado.fila.length;i+=n){fText+=`TIME ${Math.floor(i/n)+1}: [${estado.fila.slice(i,i+n).join(', ')}]<br>`;}
+  document.getElementById('fila-lista').innerHTML=fText||'Fila vazia';
 }
-
-/* Substituição */
-const subState = { out: null, time: null, inNome: null };
-function abrirSub(nome, time) {
-  subState.out = nome; subState.time = time; subState.inNome = null;
-  document.getElementById('sub-out-label').innerText = nome;
-  document.getElementById('sub-definitiva').checked = false;
-  const lista = document.getElementById('sub-in-lista');
-  if (estado.fila.length === 0) {
-    lista.innerHTML = '<div class="sub-empty-msg">⚠️ Fila vazia — sem jogadores disponíveis.</div>';
-  } else {
-    lista.innerHTML = estado.fila.map((n) => {
-      const safeNome = n.replace(/'/g, "\\'");
-      return `<button class="sub-player-btn" onclick="selecionarSubIn('${safeNome}', this)">${n}</button>`;
-    }).join('');
-  }
-  document.getElementById('modal-sub').style.display = 'flex';
+const subState={out:null,time:null,inNome:null};
+function abrirSub(nome,time){subState.out=nome;subState.time=time;subState.inNome=null;document.getElementById('sub-out-label').innerText=nome;document.getElementById('sub-definitiva').checked=false;const lista=document.getElementById('sub-in-lista');if(!estado.fila.length){lista.innerHTML='<div class="sub-empty-msg">⚠️ Fila vazia.</div>';}else{lista.innerHTML=estado.fila.map(n=>`<button class="sub-player-btn" onclick="selecionarSubIn('${n.replace(/'/g,"\\'")}',this)">${n}</button>`).join('');}document.getElementById('modal-sub').style.display='flex';}
+function selecionarSubIn(nome,el){subState.inNome=nome;document.querySelectorAll('.sub-player-btn').forEach(b=>b.classList.remove('selected'));el.classList.add('selected');}
+function fecharSub(){document.getElementById('modal-sub').style.display='none';subState.out=null;subState.time=null;subState.inNome=null;}
+function confirmarSub(){
+  if(!subState.inNome){alert('Selecione um jogador para entrar.');return;}
+  const def=document.getElementById('sub-definitiva').checked;
+  if(!confirm(`Confirmar substituição?\n⬅️ SAI: ${subState.out}\n➡️ ENTRA: ${subState.inNome}\n\n${def?'DEFINITIVA':'TEMPORÁRIA'}`))return;
+  const outP=estado.atletas.find(a=>a.n===subState.out),inP=estado.atletas.find(a=>a.n===subState.inNome);
+  if(outP){outP.active=false;outP.t=null;def?estado.fila.push(subState.out):estado.fila.unshift(subState.out);}
+  const fi=estado.fila.indexOf(subState.inNome);if(fi>-1)estado.fila.splice(fi,1);
+  if(inP){inP.active=true;inP.t=subState.time;}else estado.atletas.push({n:subState.inNome,v:0,g:0,a:0,t:subState.time,active:true});
+  document.getElementById(`l-${subState.time}`).innerHTML=`<div class="log-item">🔄 <b>${subState.inNome}</b> ↔ ${subState.out}</div>`+document.getElementById(`l-${subState.time}`).innerHTML;
+  fecharSub();render();
 }
-function selecionarSubIn(nome, el) {
-  subState.inNome = nome;
-  document.querySelectorAll('.sub-player-btn').forEach(b => b.classList.remove('selected'));
-  el.classList.add('selected');
-}
-function fecharSub() { document.getElementById('modal-sub').style.display = 'none'; subState.out = null; subState.time = null; subState.inNome = null; }
-function confirmarSub() {
-  if (!subState.inNome) { alert('Selecione um jogador da fila para entrar.'); return; }
-  const definitiva = document.getElementById('sub-definitiva').checked;
-  const tipoTexto = definitiva ? 'ENTRADA DEFINITIVA\n(sai da lista de próxima)' : 'TEMPORÁRIA\n(posição na fila mantida)';
-  const msg = `Confirmar substituição?\n\n⬅️ SAI: ${subState.out}\n➡️ ENTRA: ${subState.inNome}\n\n${tipoTexto}`;
-  if (!confirm(msg)) return;
-  const outPlayer = estado.atletas.find(a => a.n === subState.out);
-  const inPlayer = estado.atletas.find(a => a.n === subState.inNome);
-  if (outPlayer) {
-    outPlayer.active = false; outPlayer.t = null;
-    if (definitiva) estado.fila.push(subState.out);
-    else estado.fila.unshift(subState.out);
-  }
-  const filaIdx = estado.fila.indexOf(subState.inNome);
-  if (filaIdx > -1) estado.fila.splice(filaIdx, 1);
-  if (inPlayer) { inPlayer.active = true; inPlayer.t = subState.time; }
-  else { estado.atletas.push({ n: subState.inNome, v: 0, g: 0, a: 0, t: subState.time, active: true }); }
-  const log = document.getElementById(`l-${subState.time}`);
-  log.innerHTML = `<div class="log-item">🔄 <b>${subState.inNome}</b> ↔ ${subState.out}</div>` + log.innerHTML;
-  fecharSub(); render();
-}
-
-/* Fila editor */
-function abrirEditorFila() { estado.filaTemp = [...estado.fila]; renderEditor(); document.getElementById('modal-fila').style.display = 'flex'; }
-function renderEditor() {
-  const c = document.getElementById('fila-editor-container'); c.innerHTML = '';
-  estado.filaTemp.forEach((n, i) => {
-    const d = document.createElement('div'); d.className = 'fila-edit-item'; d.draggable = true;
-    d.innerHTML = `<span class="nome-jogador">☰ ${n}</span><div class="edit-btns"><button class="btn-edit" onclick="mover(${i},-1)">↑</button><button class="btn-edit" onclick="mover(${i},1)">↓</button><button class="btn-edit" style="color:var(--red)" onclick="estado.filaTemp.splice(${i},1); renderEditor();">✕</button></div>`;
-    d.addEventListener('dragstart', () => d.classList.add('dragging'));
-    d.addEventListener('dragend', () => { d.classList.remove('dragging'); reordenarTemp(); });
-    c.appendChild(d);
-  });
-}
-function reordenarTemp() { estado.filaTemp = [...document.querySelectorAll('.nome-jogador')].map(el => el.innerText.replace('☰ ', '')); }
-function mover(i, dir) { const np = i + dir; if (np >= 0 && np < estado.filaTemp.length) { [estado.filaTemp[i], estado.filaTemp[np]] = [estado.filaTemp[np], estado.filaTemp[i]]; renderEditor(); } }
-function fecharFila(save) { if (save) estado.fila = [...estado.filaTemp]; document.getElementById('modal-fila').style.display = 'none'; render(); }
-document.getElementById('fila-editor-container').addEventListener('dragover', e => {
-  e.preventDefault();
-  const after = getDragAfterElement(document.getElementById('fila-editor-container'), e.clientY);
-  const dragging = document.querySelector('.dragging');
-  if (after) document.getElementById('fila-editor-container').insertBefore(dragging, after);
-  else document.getElementById('fila-editor-container').appendChild(dragging);
-});
-function getDragAfterElement(container, y) {
-  const els = [...container.querySelectorAll('.fila-edit-item:not(.dragging)')];
-  return els.reduce((closest, child) => { const box = child.getBoundingClientRect(); const offset = y - box.top - box.height / 2; if (offset < 0 && offset > closest.offset) return { offset, element: child }; else return closest; }, { offset: Number.NEGATIVE_INFINITY }).element;
-}
-
-/* Gols */
-function gol(assist) {
-  const aObj = estado.atletas.find(x => x.n === estado.autor);
-  aObj.g++;
-  if (assist) estado.atletas.find(x => x.n === assist).a++;
-  aObj.t === 'azul' ? estado.sAzul++ : estado.sRed++;
-  document.getElementById('s-azul').innerText = estado.sAzul;
-  document.getElementById('s-red').innerText = estado.sRed;
-  document.getElementById('modal-assist').style.display = 'none';
-  const log = document.getElementById(`l-${aObj.t}`);
-  log.innerHTML = `<div class="log-item">⚽ <b>${estado.autor}</b> ${assist ? '(👟 ' + assist + ')' : ''}</div>` + log.innerHTML;
-  render();
-}
-function abrAssist(n, t) {
-  estado.autor = n;
-  const opts = document.getElementById('opts');
-  opts.innerHTML = estado.atletas.filter(a => a.t === t && a.active && a.n !== n).map(c => `<button onclick="gol('${c.n}')" style="width:100%; padding:12px; margin:5px 0; background:#222; color:#fff; border:1px solid #444; border-radius:10px;">${c.n}</button>`).join('');
-  document.getElementById('modal-assist').style.display = 'flex';
-}
-function resetPlacar() {
-  estado.sAzul = 0; estado.sRed = 0;
-  document.getElementById('s-azul').innerText = 0;
-  document.getElementById('s-red').innerText = 0;
-  document.getElementById('l-azul').innerHTML = '';
-  document.getElementById('l-red').innerHTML = '';
-  resetT();
-}
-
-/* Timer */
-function atualizarDisplayTimer() { const m = Math.floor(estado.segs / 60); const s = estado.segs % 60; document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`; }
-function startT() { if (!estado.tId) { estado.tId = setInterval(() => { if (estado.segs > 0) { estado.segs--; atualizarDisplayTimer(); } }, 1000); } }
-function pauseT() { clearInterval(estado.tId); estado.tId = null; }
-function resetT() { pauseT(); estado.segs = estado.config.tempoSecs; atualizarDisplayTimer(); }
-function addRetardatario() { const inp = document.getElementById('add-nome'); if (inp.value.trim()) { estado.fila.push(inp.value.trim()); inp.value = ''; render(); } }
-
-/* Tela 4 — escalação */
-function getFormationPositions(n) {
-  const pos = { 1:[{x:50,y:88}], 2:[{x:50,y:88},{x:50,y:28}], 3:[{x:50,y:88},{x:26,y:55},{x:74,y:55}], 4:[{x:50,y:88},{x:26,y:62},{x:74,y:62},{x:50,y:26}], 5:[{x:50,y:88},{x:22,y:65},{x:78,y:65},{x:50,y:45},{x:50,y:18}], 6:[{x:50,y:88},{x:18,y:66},{x:50,y:66},{x:82,y:66},{x:30,y:36},{x:70,y:36}], 7:[{x:50,y:88},{x:18,y:68},{x:50,y:68},{x:82,y:68},{x:25,y:47},{x:75,y:47},{x:50,y:20}], 8:[{x:50,y:88},{x:14,y:70},{x:38,y:70},{x:62,y:70},{x:86,y:70},{x:28,y:47},{x:72,y:47},{x:50,y:20}], 9:[{x:50,y:88},{x:14,y:70},{x:38,y:70},{x:62,y:70},{x:86,y:70},{x:20,y:50},{x:50,y:50},{x:80,y:50},{x:50,y:20}], 10:[{x:50,y:88},{x:14,y:72},{x:38,y:72},{x:62,y:72},{x:86,y:72},{x:18,y:52},{x:42,y:52},{x:58,y:52},{x:82,y:52},{x:50,y:20}], 11:[{x:50,y:88},{x:14,y:73},{x:38,y:73},{x:62,y:73},{x:86,y:73},{x:14,y:53},{x:38,y:53},{x:62,y:53},{x:86,y:53},{x:30,y:24},{x:70,y:24}] };
-  if (pos[n]) return pos[n];
-  const result = [{x:50,y:88}]; for (let i = 0; i < n-1; i++) result.push({x: 10+(80*(i+1)/n), y:40}); return result;
-}
-function getFormationLabel(n) { const labels = {3:'1-2',4:'2-1',5:'2-1-1',6:'3-2',7:'3-2-1',8:'4-2-1',9:'4-3-1',10:'4-4-1',11:'4-4-2'}; return labels[n] ? `⚽ ESCALAÇÃO TÁTICA · ${labels[n]}` : '⚽ ESCALAÇÃO TÁTICA'; }
-function renderLineup() {
-  const n = estado.config.jogadoresPorTime;
-  const sorted = [...estado.atletas].sort((a,b) => { if(b.v!==a.v) return b.v-a.v; if(b.g!==a.g) return b.g-a.g; return b.a-a.a; });
-  const positions = getFormationPositions(n);
-  const overlay = document.getElementById('lineup-overlay');
-  overlay.innerHTML = '';
-  const count = Math.min(n, positions.length, sorted.length);
-  for (let i = 0; i < count; i++) {
-    const player = sorted[i]; const pos = positions[i];
-    const firstName = player.n.split(' ')[0];
-    const dot = document.createElement('div'); dot.className = 'player-dot';
-    dot.style.left = pos.x + '%'; dot.style.top = pos.y + '%';
-    dot.innerHTML = `<div class="dot">${i+1}</div><span class="player-name-tag">${firstName}</span>`;
-    overlay.appendChild(dot);
-  }
-  document.getElementById('formation-label').innerText = getFormationLabel(n);
-}
-
-/* Tela 4 — relatório */
-function populateReport() {
-  const atletas = estado.atletas; const atletasApp = estado.atletasApp;
-  const nomeEvento = document.getElementById('nomeEvento').value.trim() || '—';
-  const dataEv = document.getElementById('dataEv').value;
-  const horario = document.getElementById('horarioEv').value || '—';
-  const local = document.getElementById('local').value.trim() || '—';
-  let dataFormatada = '—'; if (dataEv) { const [y,m,d] = dataEv.split('-'); dataFormatada = `${d}/${m}/${y}`; }
-  document.getElementById('ei-nome').innerText = nomeEvento;
-  document.getElementById('ei-data').innerText = dataFormatada;
-  document.getElementById('ei-hora').innerText = horario;
-  document.getElementById('ei-local').innerText = local;
-  const totalGols = atletas.reduce((sum,a) => sum+a.g, 0);
-  document.getElementById('report-total-gols').innerText = totalGols;
-  document.getElementById('report-total-atletas').innerText = atletas.length;
-  const sorted = [...atletas].sort((a,b) => { if(b.v!==a.v) return b.v-a.v; if(b.g!==a.g) return b.g-a.g; return b.a-a.a; });
-  const medals = ['🥇','🥈','🥉']; const labels = ['MVP','2º Lugar','3º Lugar'];
-  function buildMvpCard(atleta, pos) {
-    if (!atleta) return '<span style="color:#444; font-size:10px">—</span>';
-    return `<div style="font-size:${pos===0?'22px':'18px'}">${medals[pos]}</div><div style="font-size:${pos===0?'12px':'11px'}; font-weight:bold; color:#fff; margin:4px 0; word-break:break-word;">${atleta.n}</div><div class="stat-val">${atleta.g}G</div><div class="label-stat">${atleta.v}V · ${atleta.a}A</div><div class="label-stat" style="margin-top:2px">${labels[pos]}</div>`;
-  }
-  document.getElementById('mvp-1st').innerHTML = buildMvpCard(sorted[0]||null,0);
-  document.getElementById('mvp-2nd').innerHTML = buildMvpCard(sorted[1]||null,1);
-  document.getElementById('mvp-3rd').innerHTML = buildMvpCard(sorted[2]||null,2);
-  if (sorted.length===0) { document.getElementById('report-ranking').innerHTML = '<div style="color:#444; text-align:center; font-size:11px; padding:10px;">Nenhum dado de jogo registrado.</div>'; }
-  else { document.getElementById('report-ranking').innerHTML = sorted.map((a,i) => `<div class="row"><span>${i+1}. ${a.n}</span><span style="color:var(--text-gray)">${a.v}V &nbsp; ${a.g}G &nbsp; ${a.a}A</span></div>`).join(''); }
-  const confirmados = atletasApp.filter(a => a.confirmado);
-  if (confirmados.length>0) document.getElementById('report-presence').innerText = confirmados.map(a=>a.nome).join(', ');
-  else if (atletas.length>0) document.getElementById('report-presence').innerText = atletas.map(a=>a.n).join(', ');
-  else document.getElementById('report-presence').innerText = 'Nenhum atleta registrado.';
+function abrirEditorFila(){estado.filaTemp=[...estado.fila];renderEditor();document.getElementById('modal-fila').style.display='flex';}
+function renderEditor(){const c=document.getElementById('fila-editor-container');c.innerHTML='';estado.filaTemp.forEach((n,i)=>{const d=document.createElement('div');d.className='fila-edit-item';d.draggable=true;d.innerHTML=`<span class="nome-jogador">☰ ${n}</span><div class="edit-btns"><button class="btn-edit" onclick="mover(${i},-1)">↑</button><button class="btn-edit" onclick="mover(${i},1)">↓</button><button class="btn-edit" style="color:var(--red)" onclick="estado.filaTemp.splice(${i},1);renderEditor();">✕</button></div>`;d.addEventListener('dragstart',()=>d.classList.add('dragging'));d.addEventListener('dragend',()=>{d.classList.remove('dragging');reordenarTemp();});c.appendChild(d);});}
+function reordenarTemp(){estado.filaTemp=[...document.querySelectorAll('.nome-jogador')].map(el=>el.innerText.replace('☰ ',''));}
+function mover(i,dir){const np=i+dir;if(np>=0&&np<estado.filaTemp.length){[estado.filaTemp[i],estado.filaTemp[np]]=[estado.filaTemp[np],estado.filaTemp[i]];renderEditor();}}
+function fecharFila(save){if(save)estado.fila=[...estado.filaTemp];document.getElementById('modal-fila').style.display='none';render();}
+document.getElementById('fila-editor-container').addEventListener('dragover',e=>{e.preventDefault();const after=getDragAfterElement(document.getElementById('fila-editor-container'),e.clientY);const drag=document.querySelector('.dragging');if(after)document.getElementById('fila-editor-container').insertBefore(drag,after);else document.getElementById('fila-editor-container').appendChild(drag);});
+function getDragAfterElement(container,y){const els=[...container.querySelectorAll('.fila-edit-item:not(.dragging)')];return els.reduce((cl,ch)=>{const box=ch.getBoundingClientRect(),off=y-box.top-box.height/2;return(off<0&&off>cl.offset)?{offset:off,element:ch}:cl;},{offset:Number.NEGATIVE_INFINITY}).element;}
+function gol(assist){const aObj=estado.atletas.find(x=>x.n===estado.autor);aObj.g++;if(assist)estado.atletas.find(x=>x.n===assist).a++;aObj.t==='azul'?estado.sAzul++:estado.sRed++;document.getElementById('s-azul').innerText=estado.sAzul;document.getElementById('s-red').innerText=estado.sRed;document.getElementById('modal-assist').style.display='none';const log=document.getElementById(`l-${aObj.t}`);log.innerHTML=`<div class="log-item">⚽ <b>${estado.autor}</b> ${assist?'(👟 '+assist+')':''}</div>`+log.innerHTML;render();}
+function abrAssist(n,t){estado.autor=n;const opts=document.getElementById('opts');opts.innerHTML=estado.atletas.filter(a=>a.t===t&&a.active&&a.n!==n).map(c=>`<button onclick="gol('${c.n.replace(/'/g,"\\'")}') " style="width:100%;padding:12px;margin:5px 0;background:#222;color:#fff;border:1px solid #444;border-radius:10px;">${c.n}</button>`).join('');document.getElementById('modal-assist').style.display='flex';}
+function resetPlacar(){estado.sAzul=0;estado.sRed=0;document.getElementById('s-azul').innerText=0;document.getElementById('s-red').innerText=0;document.getElementById('l-azul').innerHTML='';document.getElementById('l-red').innerHTML='';resetT();}
+function atualizarDisplayTimer(){const m=Math.floor(estado.segs/60),s=estado.segs%60;document.getElementById('timer').innerText=`${m}:${s<10?'0':''}${s}`;}
+function startT(){if(!estado.tId){estado.tId=setInterval(()=>{if(estado.segs>0){estado.segs--;atualizarDisplayTimer();}},1000);}}
+function pauseT(){clearInterval(estado.tId);estado.tId=null;}
+function resetT(){pauseT();estado.segs=estado.config.tempoSecs;atualizarDisplayTimer();}
+function addRetardatario(){const inp=document.getElementById('add-nome');if(inp.value.trim()){estado.fila.push(inp.value.trim());inp.value='';render();}}
+function getFormationPositions(n){const pos={1:[{x:50,y:88}],2:[{x:50,y:88},{x:50,y:28}],3:[{x:50,y:88},{x:26,y:55},{x:74,y:55}],4:[{x:50,y:88},{x:26,y:62},{x:74,y:62},{x:50,y:26}],5:[{x:50,y:88},{x:22,y:65},{x:78,y:65},{x:50,y:45},{x:50,y:18}],6:[{x:50,y:88},{x:18,y:66},{x:50,y:66},{x:82,y:66},{x:30,y:36},{x:70,y:36}],7:[{x:50,y:88},{x:18,y:68},{x:50,y:68},{x:82,y:68},{x:25,y:47},{x:75,y:47},{x:50,y:20}],8:[{x:50,y:88},{x:14,y:70},{x:38,y:70},{x:62,y:70},{x:86,y:70},{x:28,y:47},{x:72,y:47},{x:50,y:20}],9:[{x:50,y:88},{x:14,y:70},{x:38,y:70},{x:62,y:70},{x:86,y:70},{x:20,y:50},{x:50,y:50},{x:80,y:50},{x:50,y:20}],10:[{x:50,y:88},{x:14,y:72},{x:38,y:72},{x:62,y:72},{x:86,y:72},{x:18,y:52},{x:42,y:52},{x:58,y:52},{x:82,y:52},{x:50,y:20}],11:[{x:50,y:88},{x:14,y:73},{x:38,y:73},{x:62,y:73},{x:86,y:73},{x:14,y:53},{x:38,y:53},{x:62,y:53},{x:86,y:53},{x:30,y:24},{x:70,y:24}]};if(pos[n])return pos[n];const r=[{x:50,y:88}];for(let i=0;i<n-1;i++)r.push({x:10+(80*(i+1)/n),y:40});return r;}
+function getFormationLabel(n){const l={3:'1-2',4:'2-1',5:'2-1-1',6:'3-2',7:'3-2-1',8:'4-2-1',9:'4-3-1',10:'4-4-1',11:'4-4-2'};return l[n]?`⚽ ESCALAÇÃO TÁTICA · ${l[n]}`:'⚽ ESCALAÇÃO TÁTICA';}
+function renderLineup(){const n=estado.config.jogadoresPorTime;const sorted=[...estado.atletas].sort((a,b)=>{if(b.v!==a.v)return b.v-a.v;if(b.g!==a.g)return b.g-a.g;return b.a-a.a;});const positions=getFormationPositions(n);const overlay=document.getElementById('lineup-overlay');overlay.innerHTML='';const count=Math.min(n,positions.length,sorted.length);for(let i=0;i<count;i++){const p=sorted[i],pos=positions[i],fn=p.n.split(' ')[0];const dot=document.createElement('div');dot.className='player-dot';dot.style.left=pos.x+'%';dot.style.top=pos.y+'%';dot.innerHTML=`<div class="dot">${i+1}</div><span class="player-name-tag">${fn}</span>`;overlay.appendChild(dot);}document.getElementById('formation-label').innerText=getFormationLabel(n);}
+function populateReport(){
+  const at=estado.atletas,ap=estado.atletasApp;
+  const nome=document.getElementById('nomeEvento').value.trim()||'—',dataEv=document.getElementById('dataEv').value,hora=document.getElementById('horarioEv').value||'—',local=document.getElementById('local').value.trim()||'—';
+  let df='—';if(dataEv){const[y,m,d]=dataEv.split('-');df=`${d}/${m}/${y}`;}
+  document.getElementById('ei-nome').innerText=nome;document.getElementById('ei-data').innerText=df;document.getElementById('ei-hora').innerText=hora;document.getElementById('ei-local').innerText=local;
+  const totalGols=at.reduce((s,a)=>s+a.g,0);document.getElementById('report-total-gols').innerText=totalGols;document.getElementById('report-total-atletas').innerText=at.length;
+  const sorted=[...at].sort((a,b)=>{if(b.v!==a.v)return b.v-a.v;if(b.g!==a.g)return b.g-a.g;return b.a-a.a;});
+  const med=['🥇','🥈','🥉'],lbs=['MVP','2º Lugar','3º Lugar'];
+  function bmc(a,p){if(!a)return'<span style="color:#444;font-size:10px">—</span>';return`<div style="font-size:${p===0?'22px':'18px'}">${med[p]}</div><div style="font-size:${p===0?'12px':'11px'};font-weight:bold;color:#fff;margin:4px 0;word-break:break-word;">${a.n}</div><div class="stat-val">${a.g}G</div><div class="label-stat">${a.v}V · ${a.a}A</div><div class="label-stat" style="margin-top:2px">${lbs[p]}</div>`;}
+  document.getElementById('mvp-1st').innerHTML=bmc(sorted[0]||null,0);document.getElementById('mvp-2nd').innerHTML=bmc(sorted[1]||null,1);document.getElementById('mvp-3rd').innerHTML=bmc(sorted[2]||null,2);
+  if(!sorted.length){document.getElementById('report-ranking').innerHTML='<div style="color:#444;text-align:center;font-size:11px;padding:10px;">Nenhum dado registrado.</div>';}
+  else{document.getElementById('report-ranking').innerHTML=sorted.map((a,i)=>`<div class="row"><span>${i+1}. ${a.n}</span><span style="color:var(--text-gray)">${a.v}V &nbsp; ${a.g}G &nbsp; ${a.a}A</span></div>`).join('');}
+  const conf=ap.filter(a=>a.confirmado);
+  document.getElementById('report-presence').innerText=conf.length>0?conf.map(a=>a.nome).join(', '):at.length>0?at.map(a=>a.n).join(', '):'Nenhum atleta registrado.';
   renderLineup();
 }
+async function shareReport(){const c=document.getElementById('capture');try{const canvas=await html2canvas(c,{backgroundColor:'#0c0e11',scale:2,width:c.scrollWidth+10,windowWidth:document.body.offsetWidth});canvas.toBlob(async b=>{const f=new File([b],'relatorio-arena.png',{type:'image/png'});if(navigator.canShare&&navigator.canShare({files:[f]})){await navigator.share({files:[f]});}else{const l=document.createElement('a');l.download='relatorio.png';l.href=canvas.toDataURL();l.click();}});}catch(e){console.error(e);}}
 
-async function shareReport() {
-  const container = document.getElementById('capture');
+/* =============================================
+   CRIAR PELADA NO FIRESTORE + LINK DE CONVITE
+   ============================================= */
+async function salvarPeladaEGerarConvite() {
+  if (!db) { alert('⚠️ Firebase não configurado. Configure as credenciais no código.'); return; }
+
+  const nome   = document.getElementById('nomeEvento').value.trim();
+  const local  = document.getElementById('local').value.trim();
+  const data   = document.getElementById('dataEv').value;
+  const hora   = document.getElementById('horarioEv').value;
+  const limite = parseInt(document.getElementById('limite').value) || 20;
+
+  if (!nome) { alert('Preencha o nome da pelada!'); return; }
+  if (!data || !hora) { alert('Preencha data e horário!'); return; }
+
+  // Auth anônima para o gestor se não logado
+  let uid = 'gestor';
+  let displayName = 'Gestor';
   try {
-    const canvas = await html2canvas(container, { backgroundColor:'#0c0e11', scale:2, width:container.scrollWidth+10, windowWidth:document.body.offsetWidth });
-    canvas.toBlob(async (blob) => {
-      const file = new File([blob], 'relatorio-arena.png', {type:'image/png'});
-      if (navigator.canShare && navigator.canShare({files:[file]})) { await navigator.share({files:[file]}); }
-      else { const link = document.createElement('a'); link.download='relatorio.png'; link.href=canvas.toDataURL(); link.click(); }
+    let user = auth ? auth.currentUser : null;
+    if (!user && auth) {
+      const r = await auth.signInAnonymously();
+      user = r.user;
+    }
+    if (user) { uid = user.uid; displayName = user.displayName || 'Gestor'; }
+  } catch(e) { console.warn('Auth anon:', e.message); }
+
+  const pelada = {
+    nome,
+    local,
+    data,
+    hora,
+    limite,
+    jogadoresPorTime: parseInt(document.getElementById('jogadoresPorTime').value) || 5,
+    tempoRegra:       parseInt(document.getElementById('tempoRegra').value)       || 10,
+    tipoCampo:        document.getElementById('tipoCampo').value || 'Society',
+    pixKey:           document.getElementById('pixKey').value.trim(),
+    regras:           document.getElementById('regras').value.trim(),
+    gestorUid:        uid,
+    gestorNome:       displayName,
+    confirmados:      [],
+    espera:           [],
+    criadoEm:         firebase.firestore.FieldValue.serverTimestamp(),
+  };
+
+  try {
+    const docRef = await db.collection('peladas').add(pelada);
+    _linkConviteURL = `${window.location.origin}${window.location.pathname}?pelada=${docRef.id}`;
+    document.getElementById('link-convite-box').innerText = _linkConviteURL;
+    document.getElementById('modal-pelada-criada').style.display = 'flex';
+    mostrarToast('🎉 Pelada criada! Link gerado!');
+  } catch(e) {
+    console.error('Erro ao criar pelada:', e);
+    alert('Erro ao salvar no Firebase. Verifique as regras do Firestore (veja instruções abaixo).\n\nErro: ' + e.message);
+  }
+}
+
+function copiarLinkConvite() {
+  navigator.clipboard.writeText(_linkConviteURL).then(() => { mostrarToast('✅ Link copiado!'); }).catch(() => { alert('Link: ' + _linkConviteURL); });
+}
+
+function compartilharConviteWhatsApp() {
+  const n    = document.getElementById('nomeEvento').value.trim() || 'Pelada';
+  const data = document.getElementById('dataEv').value;
+  const hora = document.getElementById('horarioEv').value;
+  const loc  = document.getElementById('local').value.trim();
+  const lim  = document.getElementById('limite').value || '?';
+  let df = data;
+  if (data) { const [y,m,d] = data.split('-'); df = `${d}/${m}/${y}`; }
+
+  const txt = `⚽ *CONVITE — ${n.toUpperCase()}*\n\n📅 Data: *${df}*\n⏰ Horário: *${hora}*\n📍 Local: *${loc}*\n\n✅ Vagas: ${lim} jogadores\n\n👇 Clique para confirmar sua presença:\n${_linkConviteURL}\n\n_Gerado pelo Arena Fut PRO_ ⚡`;
+  window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`, '_blank');
+}
+
+/* =============================================
+   PÁGINA DE CONVITE — LÓGICA COMPLETA
+   ============================================= */
+async function inicializarPaginaConvite(peladaId) {
+  // Auth anônima para convidados
+  try {
+    if (auth) {
+      const uid = localStorage.getItem(`afp_uid_${peladaId}`);
+      const nome = localStorage.getItem(`afp_nome_${peladaId}`);
+      if (uid) { _meuUid = uid; _meuNome = nome; }
+      else {
+        const r = await auth.signInAnonymously();
+        _meuUid = r.user.uid;
+        localStorage.setItem(`afp_uid_${peladaId}`, _meuUid);
+      }
+    }
+  } catch(e) {
+    _meuUid = localStorage.getItem(`afp_uid_${peladaId}`) || ('anon_' + Math.random().toString(36).substr(2,9));
+    localStorage.setItem(`afp_uid_${peladaId}`, _meuUid);
+    _meuNome = localStorage.getItem(`afp_nome_${peladaId}`);
+  }
+
+  if (!db) {
+    document.getElementById('c-nome').innerText = '⚠️ Firebase não configurado';
+    document.getElementById('c-subtitulo').innerText = 'Configure o Firebase para usar esta função.';
+    return;
+  }
+
+  // Listener em tempo real
+  _conviteUnsub = db.collection('peladas').doc(peladaId).onSnapshot(
+    doc => {
+      if (!doc.exists) {
+        document.getElementById('c-nome').innerText = '❌ Pelada não encontrada';
+        document.getElementById('c-subtitulo').innerText = 'Este link pode ter expirado.';
+        return;
+      }
+      _conviteData = { id: doc.id, ...doc.data() };
+      renderPaginaConvite(_conviteData);
+    },
+    err => { console.error('Erro no listener:', err); }
+  );
+}
+
+function renderPaginaConvite(d) {
+  // Header
+  document.getElementById('c-nome').innerText = d.nome || 'Pelada';
+  document.getElementById('c-subtitulo').innerText = `${d.tipoCampo || 'Futebol'} · ${d.jogadoresPorTime || 5} por time`;
+
+  // Info
+  let df = d.data;
+  if (df) { const [y,m,dt] = df.split('-'); df = `${dt}/${m}/${y}`; }
+  document.getElementById('c-data').innerText    = df || '—';
+  document.getElementById('c-hora').innerText    = d.hora || '—';
+  document.getElementById('c-local').innerText   = d.local || '—';
+  document.getElementById('c-formato').innerText = `${d.jogadoresPorTime||5}x${d.jogadoresPorTime||5} · ${d.tipoCampo||'Society'}`;
+
+  // Botão mapa
+  const mapaUrl = `https://maps.google.com/?q=${encodeURIComponent(d.local || '')}`;
+  document.getElementById('c-btn-mapa').href = mapaUrl;
+  if (!d.local) document.getElementById('c-btn-mapa').style.display = 'none';
+
+  // Countdown
+  iniciarCountdown(d.data, d.hora);
+
+  // Vagas
+  const conf = d.confirmados || [];
+  const esp  = d.espera || [];
+  const lim  = d.limite || 20;
+  const pct  = Math.min(100, Math.round(conf.length / lim * 100));
+  const vagas = Math.max(0, lim - conf.length);
+  const vagas_card = document.getElementById('c-vagas-card');
+  document.getElementById('c-vagas-num').innerText = `${conf.length}/${lim}`;
+  document.getElementById('c-vagas-fill').style.width = pct + '%';
+  if (conf.length >= lim) {
+    vagas_card.classList.add('vagas-esgotadas');
+    document.getElementById('c-vagas-fill').classList.add('esgotada');
+    document.getElementById('c-vagas-texto').innerText = `⚠️ Vagas esgotadas! ${esp.length} na fila de espera.`;
+  } else {
+    vagas_card.classList.remove('vagas-esgotadas');
+    document.getElementById('c-vagas-fill').classList.remove('esgotada');
+    document.getElementById('c-vagas-texto').innerText = `Ainda ${vagas} vaga${vagas!==1?'s':''} disponível${vagas!==1?'s':''}!`;
+  }
+
+  // Meu status
+  const euConf  = conf.find(c => c.uid === _meuUid);
+  const euEsp   = esp.find(c => c.uid === _meuUid);
+  const posEsp  = esp.findIndex(c => c.uid === _meuUid);
+
+  const statusCard = document.getElementById('c-meu-status');
+  const btnConf    = document.getElementById('btn-confirmar-convite');
+  const btnCanc    = document.getElementById('btn-cancelar-convite');
+
+  if (euConf) {
+    statusCard.className = 'meu-status-card status-confirmado';
+    statusCard.innerText = `✅ ${euConf.nome || _meuNome || 'Você'} — CONFIRMADO!`;
+    statusCard.style.display = 'block';
+    btnConf.style.display = 'none';
+    btnCanc.style.display = 'block';
+  } else if (euEsp) {
+    statusCard.className = 'meu-status-card status-espera';
+    statusCard.innerText = `⏳ ${euEsp.nome || _meuNome || 'Você'} — LISTA DE ESPERA (Posição: ${posEsp + 1}º)`;
+    statusCard.style.display = 'block';
+    btnConf.style.display = 'none';
+    btnCanc.style.display = 'block';
+  } else {
+    statusCard.style.display = 'none';
+    btnConf.style.display = 'block';
+    btnCanc.style.display = 'none';
+    if (conf.length >= lim) {
+      btnConf.innerText = '⏳ ENTRAR NA LISTA DE ESPERA';
+      btnConf.style.background = 'linear-gradient(135deg,#8a6200,var(--gold))';
+    } else {
+      btnConf.innerText = '✅ CONFIRMAR PRESENÇA';
+      btnConf.style.background = 'linear-gradient(135deg,#00cc6a,#00ff88)';
+    }
+  }
+
+  // Listas
+  document.getElementById('c-count-conf').innerText = conf.length;
+  document.getElementById('c-count-esp').innerText  = esp.length;
+  document.getElementById('c-lista-conf').innerHTML = conf.length
+    ? conf.map((c,i) => `<div class="lista-player-row ${c.uid===_meuUid?'lista-player-eu':''}"><span class="lista-player-pos">${i+1}.</span>${c.uid===_meuUid?'⭐ ':''}${c.nome || '—'}</div>`).join('')
+    : '<div class="lista-empty">Nenhum ainda</div>';
+  document.getElementById('c-lista-esp').innerHTML = esp.length
+    ? esp.map((c,i) => `<div class="lista-player-row ${c.uid===_meuUid?'lista-player-eu':''}"><span class="lista-player-pos">${i+1}º</span>${c.uid===_meuUid?'⭐ ':''}${c.nome || '—'}</div>`).join('')
+    : '<div class="lista-empty">Fila vazia</div>';
+
+  // PIX
+  if (d.pixKey) {
+    document.getElementById('c-pix-card').style.display = 'block';
+    document.getElementById('c-pix-val').innerText = d.pixKey;
+  }
+
+  // Regras
+  if (d.regras) {
+    document.getElementById('c-regras-accordion').style.display = 'block';
+    document.getElementById('c-regras-content').innerText = d.regras;
+  }
+}
+
+function iniciarCountdown(dataStr, horaStr) {
+  if (_contdownTimer) clearInterval(_contdownTimer);
+  function atualizar() {
+    if (!dataStr || !horaStr) return;
+    const alvo = new Date(`${dataStr}T${horaStr}:00`);
+    const agora = new Date();
+    const diff = alvo - agora;
+    const container = document.getElementById('c-countdown');
+    if (diff <= 0) {
+      container.innerHTML = '<div class="cd-expired">🏃 É HOJE! BORA PRO CAMPO!</div>';
+      clearInterval(_contdownTimer);
+      return;
+    }
+    const dias  = Math.floor(diff / 86400000);
+    const horas = Math.floor((diff % 86400000) / 3600000);
+    const min   = Math.floor((diff % 3600000) / 60000);
+    const seg   = Math.floor((diff % 60000) / 1000);
+    const p = n => String(n).padStart(2,'0');
+    document.getElementById('cd-dias').innerText  = p(dias);
+    document.getElementById('cd-horas').innerText = p(horas);
+    document.getElementById('cd-min').innerText   = p(min);
+    document.getElementById('cd-seg').innerText   = p(seg);
+  }
+  atualizar();
+  _contdownTimer = setInterval(atualizar, 1000);
+}
+
+function abrirModalNomeConvite() {
+  // Se já temos o nome salvo, confirma direto
+  if (_meuNome) { executarConfirmacaoConvite(); return; }
+  document.getElementById('input-nome-convidado').value = '';
+  document.getElementById('modal-nome-convidado').style.display = 'flex';
+  setTimeout(() => document.getElementById('input-nome-convidado').focus(), 200);
+}
+
+async function executarConfirmacaoConvite() {
+  const nomeInput = document.getElementById('input-nome-convidado');
+  const nome = nomeInput ? nomeInput.value.trim() : _meuNome;
+  if (!nome) { alert('Digite seu nome para confirmar!'); return; }
+
+  _meuNome = nome;
+  localStorage.setItem(`afp_nome_${CONVITE_ID}`, nome);
+  document.getElementById('modal-nome-convidado').style.display = 'none';
+
+  if (!db || !_conviteData) return;
+  const docRef = db.collection('peladas').doc(CONVITE_ID);
+
+  try {
+    await db.runTransaction(async tx => {
+      const doc = await tx.get(docRef);
+      const d   = doc.data();
+      const conf = d.confirmados || [];
+      const esp  = d.espera || [];
+      const lim  = d.limite || 20;
+
+      // Já está em alguma lista?
+      if (conf.some(c => c.uid === _meuUid) || esp.some(c => c.uid === _meuUid)) return;
+
+      const entrada = { uid: _meuUid, nome, timestamp: new Date().toISOString() };
+      if (conf.length < lim) {
+        tx.update(docRef, { confirmados: [...conf, entrada] });
+        mostrarToast('✅ Presença confirmada!');
+      } else {
+        tx.update(docRef, { espera: [...esp, entrada] });
+        mostrarToast('⏳ Adicionado à lista de espera!');
+      }
     });
-  } catch(err) { console.error('Erro ao compartilhar:', err); }
+  } catch(e) {
+    console.error('Erro ao confirmar:', e);
+    alert('Erro ao confirmar presença. Tente novamente.\n' + e.message);
+  }
+}
+
+async function cancelarPresencaConvite() {
+  if (!db || !_meuUid) return;
+  if (!confirm('Tem certeza que deseja cancelar sua presença?')) return;
+  const docRef = db.collection('peladas').doc(CONVITE_ID);
+
+  try {
+    await db.runTransaction(async tx => {
+      const doc = await tx.get(docRef);
+      const d   = doc.data();
+      let conf = [...(d.confirmados || [])];
+      let esp  = [...(d.espera || [])];
+
+      const eraDaLista  = conf.some(c => c.uid === _meuUid);
+      conf = conf.filter(c => c.uid !== _meuUid);
+      esp  = esp.filter( c => c.uid !== _meuUid);
+
+      // Auto-promoção: se saiu da lista confirmada e tem gente na espera
+      if (eraDaLista && esp.length > 0) {
+        const promovido = esp.shift(); // remove o primeiro da espera
+        conf.push({ ...promovido, timestamp: new Date().toISOString() });
+        console.log(`🆙 ${promovido.nome} promovido automaticamente da espera!`);
+      }
+
+      tx.update(docRef, { confirmados: conf, espera: esp });
+    });
+    mostrarToast('❌ Presença cancelada.');
+  } catch(e) {
+    console.error('Erro ao cancelar:', e);
+    alert('Erro ao cancelar. Tente novamente.\n' + e.message);
+  }
+}
+
+function copiarPixConvite() {
+  const key = document.getElementById('c-pix-val').innerText;
+  navigator.clipboard.writeText(key)
+    .then(() => {
+      const msg = document.getElementById('pix-copied-msg');
+      msg.style.display = 'block';
+      setTimeout(() => { msg.style.display = 'none'; }, 2500);
+      mostrarToast('✅ Chave PIX copiada!');
+    })
+    .catch(() => { alert('Chave PIX: ' + key); });
+}
+
+/* =============================================
+   OPTIONAL: Google Maps Autocomplete
+   (ativa automaticamente se a API estiver carregada)
+   ============================================= */
+function initMapsAutocomplete() {
+  const input = document.getElementById('local');
+  if (!input || typeof google === 'undefined') return;
+  const ac = new google.maps.places.Autocomplete(input, {
+    types: ['establishment', 'geocode'],
+    componentRestrictions: { country: 'br' }
+  });
+  ac.addListener('place_changed', () => {
+    const place = ac.getPlace();
+    if (place.geometry) {
+      input._lat = place.geometry.location.lat();
+      input._lng = place.geometry.location.lng();
+      input.value = place.formatted_address || place.name;
+    }
+  });
 }
 </script>
-
 <script>
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("sw.js");
