@@ -9,9 +9,13 @@
 <meta name="theme-color" content="#0c0e11">
 <link rel="icon" href="icon-192.png">
 <link rel="apple-touch-icon" href="icon-192.png">
+
+<!-- Firebase v9 compat -->
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
 <style>
 /* =============================================
    VARIÁVEIS GLOBAIS
@@ -45,6 +49,265 @@ body {
 }
 
 /* =============================================
+   TELA 0 — LANDING PAGE
+   ============================================= */
+#tela0 {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0c0e11;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 24px 40px;
+  overflow: hidden;
+}
+
+/* Partículas decorativas de fundo */
+#tela0::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% 0%, rgba(0,255,136,0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 40% at 20% 100%, rgba(0,242,255,0.06) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* Campo SVG decorativo ao fundo */
+.t0-bg-field {
+  position: absolute;
+  width: 340px;
+  opacity: 0.04;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+/* Logotipo / badge */
+.t0-badge {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 28px;
+  position: relative;
+  z-index: 1;
+}
+.t0-badge-icon {
+  font-size: 56px;
+  line-height: 1;
+  filter: drop-shadow(0 0 18px rgba(0,255,136,0.45));
+  margin-bottom: 6px;
+  animation: pulse-badge 2.4s ease-in-out infinite;
+}
+@keyframes pulse-badge {
+  0%,100% { transform: scale(1); filter: drop-shadow(0 0 18px rgba(0,255,136,0.45)); }
+  50%      { transform: scale(1.06); filter: drop-shadow(0 0 28px rgba(0,255,136,0.7)); }
+}
+.t0-app-name {
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  background: linear-gradient(90deg, var(--neon), var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.t0-app-sub {
+  font-size: 10px;
+  font-weight: 700;
+  color: #444;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+
+/* Copy principal */
+.t0-copy {
+  text-align: center;
+  margin-bottom: 30px;
+  position: relative;
+  z-index: 1;
+}
+.t0-headline {
+  font-size: clamp(22px, 7vw, 30px);
+  font-weight: 900;
+  line-height: 1.2;
+  margin-bottom: 12px;
+  color: #fff;
+}
+.t0-headline .destaque {
+  background: linear-gradient(90deg, var(--neon), var(--neon-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.t0-sub {
+  font-size: 14px;
+  color: #888;
+  line-height: 1.6;
+  max-width: 320px;
+  margin: 0 auto;
+}
+.t0-sub strong { color: #bbb; }
+
+/* Chips de features */
+.t0-chips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 32px;
+  position: relative;
+  z-index: 1;
+}
+.t0-chip {
+  background: rgba(255,255,255,0.05);
+  border: 1px solid #2a2a2a;
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 11px;
+  color: #888;
+  font-weight: 600;
+}
+.t0-chip span { margin-right: 4px; }
+
+/* Botões */
+.t0-btns {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Botão Google */
+.btn-google {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: #fff;
+  color: #3c4043;
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: 0.2px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.4);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-google:active { transform: scale(0.97); }
+.btn-google svg { flex-shrink: 0; }
+
+/* Botão instalar PWA */
+.btn-install {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  padding: 14px 20px;
+  background: linear-gradient(135deg, #0d1f14, #0a1a10);
+  color: var(--neon);
+  font-size: 14px;
+  font-weight: 700;
+  border-radius: 12px;
+  border: 1px solid rgba(0,255,136,0.35);
+  cursor: pointer;
+  text-transform: none;
+  letter-spacing: 0.2px;
+  box-shadow: 0 0 16px rgba(0,255,136,0.12);
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.btn-install:active { transform: scale(0.97); }
+.btn-install .install-icon { font-size: 20px; }
+
+/* Texto iOS instrução */
+.ios-install-tip {
+  background: rgba(0,242,255,0.07);
+  border: 1px solid rgba(0,242,255,0.2);
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-size: 11px;
+  color: #7ecfda;
+  line-height: 1.6;
+  text-align: center;
+  display: none;
+}
+.ios-install-tip.show { display: block; }
+
+/* Texto persuasivo abaixo do install */
+.t0-install-sub {
+  text-align: center;
+  font-size: 11px;
+  color: #555;
+  line-height: 1.5;
+  margin-top: -4px;
+}
+
+/* Skip link */
+.t0-skip {
+  margin-top: 10px;
+  font-size: 11px;
+  color: #444;
+  cursor: pointer;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-align: center;
+  background: none;
+  border: none;
+  width: 100%;
+  text-transform: none;
+  letter-spacing: 0;
+  font-weight: 400;
+}
+.t0-skip:hover { color: #666; }
+
+/* Loading spinner */
+.t0-loader {
+  display: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid rgba(60,64,67,0.3);
+  border-top-color: #4285f4;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+.btn-google.loading .t0-loader { display: block; }
+.btn-google.loading .btn-google-content { display: none; }
+
+/* Toast de boas-vindas */
+.t0-toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: #1a2d20;
+  border: 1px solid rgba(0,255,136,0.4);
+  border-radius: 12px;
+  padding: 10px 18px;
+  font-size: 13px;
+  color: var(--neon);
+  font-weight: 700;
+  z-index: 10000;
+  transition: transform 0.35s cubic-bezier(.34,1.56,.64,1);
+  white-space: nowrap;
+  pointer-events: none;
+}
+.t0-toast.show { transform: translateX(-50%) translateY(0); }
+
+/* =============================================
    ESTILOS GERAIS — TELA 1 e TELA 2
    ============================================= */
 .card {
@@ -65,7 +328,6 @@ button {
   transition: 0.2s;
 }
 .btn-neon { background: var(--neon); color: #000; padding: 15px; width: 100%; font-size: 1rem; }
-
 label {
   font-size: 0.65rem;
   color: var(--neon);
@@ -143,17 +405,9 @@ textarea { height: auto; padding: 12px; resize: none; }
 .team-card { background: var(--card3); border-radius: 12px; border: 1px solid #222; overflow: hidden; }
 .t-header { padding: 8px; font-size: 10px; font-weight: 900; text-align: center; text-transform: uppercase; color: #fff; }
 .team-card .row { display: flex; justify-content: space-between; align-items: center; padding: 8px; border-bottom: 1px solid #1c1f24; font-size: 11px; gap: 0; margin-bottom: 0; }
-/* ── ALTERAÇÃO 1: botões GOL + SUB lado a lado ── */
-.btn-gol {
-  background: #111; border: 1px solid var(--neon); color: var(--neon);
-  font-size: 9px; padding: 4px 7px; border-radius: 5px; font-weight: bold;
-}
-.btn-sub {
-  background: #111; border: 1px solid var(--gold); color: var(--gold);
-  font-size: 9px; padding: 4px 7px; border-radius: 5px; font-weight: bold;
-}
+.btn-gol { background: #111; border: 1px solid var(--neon); color: var(--neon); font-size: 9px; padding: 4px 7px; border-radius: 5px; font-weight: bold; }
+.btn-sub { background: #111; border: 1px solid var(--gold); color: var(--gold); font-size: 9px; padding: 4px 7px; border-radius: 5px; font-weight: bold; }
 .btn-actions { display: flex; gap: 4px; flex-shrink: 0; }
-
 .logs-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; background: var(--card3); border: 1px solid #222; border-radius: 12px; padding: 10px; min-height: 85px; }
 .log-header { font-size: 9px; font-weight: 900; color: #444; text-align: center; margin-bottom: 5px; }
 .log-item { font-size: 10px; margin-bottom: 4px; color: #aaa; }
@@ -178,46 +432,15 @@ textarea { height: auto; padding: 12px; resize: none; }
 .edit-btns { display: flex; gap: 5px; }
 .btn-edit { background: #333; border: 1px solid #444; color: #fff; padding: 5px 10px; border-radius: 5px; font-size: 14px; }
 .btn-confirm { padding: 12px 20px; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; }
-
-/* ── ALTERAÇÃO 1: estilos do modal de substituição ── */
-.sub-player-btn {
-  width: 100%; padding: 11px 14px; margin: 5px 0;
-  background: #222; color: #fff;
-  border: 1px solid #444; border-radius: 10px;
-  font-size: 12px; text-align: left; cursor: pointer;
-  transition: border-color 0.15s, color 0.15s;
-}
-.sub-player-btn.selected {
-  border-color: var(--neon);
-  color: var(--neon);
-  background: rgba(0,255,136,0.08);
-}
-.sub-check-label {
-  display: flex; align-items: flex-start; gap: 10px;
-  font-size: 12px; color: #ccc; margin: 14px 0 16px; cursor: pointer;
-  line-height: 1.4;
-}
-.sub-check-label input[type="checkbox"] {
-  width: 18px; height: 18px; flex-shrink: 0;
-  border: 2px solid var(--gold); border-radius: 4px;
-  appearance: none; -webkit-appearance: none;
-  background: #111; cursor: pointer; position: relative; margin-top: 1px;
-}
+.sub-player-btn { width: 100%; padding: 11px 14px; margin: 5px 0; background: #222; color: #fff; border: 1px solid #444; border-radius: 10px; font-size: 12px; text-align: left; cursor: pointer; transition: border-color 0.15s, color 0.15s; }
+.sub-player-btn.selected { border-color: var(--neon); color: var(--neon); background: rgba(0,255,136,0.08); }
+.sub-check-label { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; color: #ccc; margin: 14px 0 16px; cursor: pointer; line-height: 1.4; }
+.sub-check-label input[type="checkbox"] { width: 18px; height: 18px; flex-shrink: 0; border: 2px solid var(--gold); border-radius: 4px; appearance: none; -webkit-appearance: none; background: #111; cursor: pointer; position: relative; margin-top: 1px; }
 .sub-check-label input[type="checkbox"]:checked { background: var(--gold); }
-.sub-check-label input[type="checkbox"]:checked::after {
-  content: '✓'; position: absolute; color: #000;
-  font-weight: 900; font-size: 12px; left: 2px; top: -1px;
-}
-.sub-info-box {
-  background: #111; border: 1px solid #333; border-radius: 10px;
-  padding: 10px 14px; margin-bottom: 14px;
-  font-size: 12px; color: #aaa; line-height: 1.6;
-}
+.sub-check-label input[type="checkbox"]:checked::after { content: '✓'; position: absolute; color: #000; font-weight: 900; font-size: 12px; left: 2px; top: -1px; }
+.sub-info-box { background: #111; border: 1px solid #333; border-radius: 10px; padding: 10px 14px; margin-bottom: 14px; font-size: 12px; color: #aaa; line-height: 1.6; }
 .sub-info-box strong { color: var(--neon-red); }
-.sub-section-label {
-  font-size: 10px; font-weight: 900; color: var(--gold);
-  text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px;
-}
+.sub-section-label { font-size: 10px; font-weight: 900; color: var(--gold); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
 .sub-empty-msg { font-size: 12px; color: #555; padding: 10px 0; text-align: center; }
 
 /* =============================================
@@ -228,85 +451,24 @@ textarea { height: auto; padding: 12px; resize: none; }
 #screen-4 .logo-title { font-weight: 800; font-size: 20px; text-transform: uppercase; letter-spacing: 1px; }
 #screen-4 .report-bar { background: linear-gradient(90deg,#004d4f,var(--neon-cyan)); padding: 8px 15px; border-radius: 50px; font-size: 11px; margin: 10px 0; font-weight: bold; display: inline-block; clip-path: polygon(10% 0,100% 0,90% 100%,0% 100%); }
 #screen-4 .stats-total { font-size: 10px; color: var(--text-gray); }
-
-/* ── ALTERAÇÃO 4: barra de informações do evento ── */
-#screen-4 .event-info-bar {
-  background: linear-gradient(135deg, rgba(0,242,255,0.06), rgba(0,77,79,0.3));
-  border: 1px solid rgba(0,242,255,0.35);
-  border-radius: 12px;
-  padding: 10px 12px;
-  margin-bottom: 16px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  justify-content: space-around;
-}
+#screen-4 .event-info-bar { background: linear-gradient(135deg,rgba(0,242,255,0.06),rgba(0,77,79,0.3)); border: 1px solid rgba(0,242,255,0.35); border-radius: 12px; padding: 10px 12px; margin-bottom: 16px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: space-around; }
 #screen-4 .ei-item { text-align: center; flex: 1; min-width: 60px; }
 #screen-4 .ei-label { font-size: 8px; color: var(--neon-cyan); font-weight: 900; text-transform: uppercase; letter-spacing: 0.5px; }
 #screen-4 .ei-value { font-size: 11px; color: #fff; font-weight: bold; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-
-/* Campo tático */
-#screen-4 .field-view {
-  width: 100%; height: 300px;
-  border: 2px solid var(--neon-cyan); border-radius: 14px;
-  background: #111; position: relative; margin-bottom: 8px; overflow: hidden;
-}
+#screen-4 .field-view { width: 100%; height: 300px; border: 2px solid var(--neon-cyan); border-radius: 14px; background: #111; position: relative; margin-bottom: 8px; overflow: hidden; }
 #screen-4 .pitch-svg { width: 100%; height: 100%; display: block; }
-#screen-4 .formation-label {
-  text-align: center; font-size: 9px; font-weight: 900;
-  color: var(--neon-cyan); letter-spacing: 3px; text-transform: uppercase;
-  margin-bottom: 16px; opacity: 0.8;
-}
-#screen-4 .player-dot {
-  position: absolute; transform: translate(-50%, -50%);
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  pointer-events: none; z-index: 2;
-}
-#screen-4 .dot {
-  width: 26px; height: 26px; background: var(--neon-cyan);
-  border-radius: 50%; border: 2px solid #fff;
-  display: flex; align-items: center; justify-content: center;
-  font-size: 9px; font-weight: 900; color: #000;
-  box-shadow: 0 0 10px rgba(0,242,255,0.75), 0 0 20px rgba(0,242,255,0.3);
-}
-#screen-4 .player-name-tag {
-  font-size: 7px; color: #fff; font-weight: 800;
-  background: rgba(0,0,0,0.75); padding: 1px 5px; border-radius: 4px;
-  white-space: nowrap; max-width: 46px; overflow: hidden; text-overflow: ellipsis;
-}
-
-/* ── ALTERAÇÃO 3: MVP cards com mais destaque ── */
-#screen-4 .mvp-wrapper {
-  display: grid; grid-template-columns: 1fr 1.3fr 1fr;
-  align-items: end; gap: 8px; margin-bottom: 30px;
-}
-#screen-4 .card-player {
-  background: #1a1a1a; padding: 10px 5px; text-align: center;
-  border-radius: 10px; min-height: 50px;
-  transition: transform 0.2s;
-}
-#screen-4 .card-red {
-  border: 2px solid var(--neon-red);
-  box-shadow: 0 0 16px rgba(255,60,60,0.5), 0 4px 22px rgba(255,60,60,0.25), inset 0 0 12px rgba(255,60,60,0.06);
-  transform: scale(1.04);
-}
-#screen-4 .card-gold {
-  border: 2px solid var(--gold);
-  box-shadow: 0 0 28px rgba(255,204,0,0.65), 0 6px 32px rgba(255,204,0,0.35), inset 0 0 16px rgba(255,204,0,0.08);
-  transform: scale(1.14);
-  z-index: 2;
-  background: linear-gradient(160deg, #1e1a00, #1a1a1a);
-}
-#screen-4 .card-blue {
-  border: 2px solid var(--neon-cyan);
-  box-shadow: 0 0 16px rgba(0,242,255,0.5), 0 4px 22px rgba(0,242,255,0.25), inset 0 0 12px rgba(0,242,255,0.06);
-  transform: scale(1.04);
-}
+#screen-4 .formation-label { text-align: center; font-size: 9px; font-weight: 900; color: var(--neon-cyan); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 16px; opacity: 0.8; }
+#screen-4 .player-dot { position: absolute; transform: translate(-50%,-50%); display: flex; flex-direction: column; align-items: center; gap: 2px; pointer-events: none; z-index: 2; }
+#screen-4 .dot { width: 26px; height: 26px; background: var(--neon-cyan); border-radius: 50%; border: 2px solid #fff; display: flex; align-items: center; justify-content: center; font-size: 9px; font-weight: 900; color: #000; box-shadow: 0 0 10px rgba(0,242,255,0.75),0 0 20px rgba(0,242,255,0.3); }
+#screen-4 .player-name-tag { font-size: 7px; color: #fff; font-weight: 800; background: rgba(0,0,0,0.75); padding: 1px 5px; border-radius: 4px; white-space: nowrap; max-width: 46px; overflow: hidden; text-overflow: ellipsis; }
+#screen-4 .mvp-wrapper { display: grid; grid-template-columns: 1fr 1.3fr 1fr; align-items: end; gap: 8px; margin-bottom: 30px; }
+#screen-4 .card-player { background: #1a1a1a; padding: 10px 5px; text-align: center; border-radius: 10px; min-height: 50px; transition: transform 0.2s; }
+#screen-4 .card-red { border: 2px solid var(--neon-red); box-shadow: 0 0 16px rgba(255,60,60,0.5),0 4px 22px rgba(255,60,60,0.25),inset 0 0 12px rgba(255,60,60,0.06); transform: scale(1.04); }
+#screen-4 .card-gold { border: 2px solid var(--gold); box-shadow: 0 0 28px rgba(255,204,0,0.65),0 6px 32px rgba(255,204,0,0.35),inset 0 0 16px rgba(255,204,0,0.08); transform: scale(1.14); z-index: 2; background: linear-gradient(160deg,#1e1a00,#1a1a1a); }
+#screen-4 .card-blue { border: 2px solid var(--neon-cyan); box-shadow: 0 0 16px rgba(0,242,255,0.5),0 4px 22px rgba(0,242,255,0.25),inset 0 0 12px rgba(0,242,255,0.06); transform: scale(1.04); }
 #screen-4 .stat-val { font-size: 16px; font-weight: 900; color: var(--gold); }
 #screen-4 .card-gold .stat-val { font-size: 20px; }
 #screen-4 .label-stat { font-size: 7px; color: var(--text-gray); text-transform: uppercase; }
-
-/* Resultados e presença */
 #screen-4 .results-box { background: var(--card-bg); border-radius: 15px; padding: 15px; margin-bottom: 20px; }
 #screen-4 .results-title { text-align: center; font-size: 12px; font-weight: bold; margin-bottom: 10px; }
 #screen-4 .results-box .row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 11px; gap: 0; margin-bottom: 0; }
@@ -317,8 +479,97 @@ textarea { height: auto; padding: 12px; resize: none; }
 </head>
 <body>
 
+<!-- =============================================
+     TELA 0 — LANDING PAGE
+     ============================================= -->
+<div id="tela0">
+
+  <!-- Campo decorativo de fundo -->
+  <svg class="t0-bg-field" viewBox="0 0 200 130" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <rect x="5" y="5" width="190" height="120" rx="4" stroke="white" stroke-width="2"/>
+    <line x1="100" y1="5" x2="100" y2="125" stroke="white" stroke-width="1.5"/>
+    <circle cx="100" cy="65" r="18" stroke="white" stroke-width="1.5"/>
+    <rect x="5" y="42" width="28" height="42" stroke="white" stroke-width="1.5"/>
+    <rect x="167" y="42" width="28" height="42" stroke="white" stroke-width="1.5"/>
+    <rect x="5" y="52" width="12" height="22" stroke="white" stroke-width="1.5"/>
+    <rect x="183" y="52" width="12" height="22" stroke="white" stroke-width="1.5"/>
+  </svg>
+
+  <!-- Badge / logo -->
+  <div class="t0-badge">
+    <div class="t0-badge-icon">⚽</div>
+    <div class="t0-app-name">Arena Fut PRO</div>
+    <div class="t0-app-sub">Gestão de Pelada</div>
+  </div>
+
+  <!-- Copy principal -->
+  <div class="t0-copy">
+    <div class="t0-headline">
+      Sua pelada tá no<br>
+      <span class="destaque">próximo nível, craque!</span>
+    </div>
+    <p class="t0-sub">
+      Escalação, gols, ranking e resenha —
+      <strong>tudo numa tela só.</strong>
+      É gol de placa na organização! ⚡
+    </p>
+  </div>
+
+  <!-- Chips de features -->
+  <div class="t0-chips">
+    <div class="t0-chip"><span>🏆</span>Ranking</div>
+    <div class="t0-chip"><span>⏱️</span>Timer</div>
+    <div class="t0-chip"><span>📋</span>Fila</div>
+    <div class="t0-chip"><span>📤</span>Compartilhar</div>
+    <div class="t0-chip"><span>🔄</span>Substituição</div>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="t0-btns">
+
+    <!-- Botão Google Login -->
+    <button class="btn-google" id="btn-google-login" onclick="loginGoogle()">
+      <div class="t0-loader" id="google-loader"></div>
+      <div class="btn-google-content" style="display:flex; align-items:center; gap:10px;">
+        <!-- Logo oficial Google SVG -->
+        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
+          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" fill="#4285F4"/>
+          <path d="M9 18c2.43 0 4.467-.806 5.956-2.184l-2.908-2.258c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 0 0 9 18z" fill="#34A853"/>
+          <path d="M3.964 10.707A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.707V4.961H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.039l3.007-2.332z" fill="#FBBC05"/>
+          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 0 0 .957 4.961L3.964 7.293C4.672 5.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+        </svg>
+        <span>Entrar com Google</span>
+      </div>
+    </button>
+
+    <!-- Botão instalar PWA (aparece só quando disponível) -->
+    <button class="btn-install hidden" id="btn-install-pwa" onclick="instalarPWA()">
+      <span class="install-icon">📲</span>
+      <span id="install-btn-text">Instalar App</span>
+    </button>
+
+    <!-- Dica iOS (aparece só no Safari/iOS) -->
+    <div class="ios-install-tip" id="ios-tip">
+      📱 No iPhone: toque em <strong style="color:#fff;">Compartilhar</strong> → depois em
+      <strong style="color:#fff;">"Adicionar à Tela de Início"</strong> para ter o app na tela inicial!
+    </div>
+
+    <!-- Texto persuasivo do install -->
+    <p class="t0-install-sub" id="install-sub-text" style="display:none;">
+      Pra não perder a resenha e ter seu time na mão, baixa logo o app e deixa na tela inicial! É de graça! 🔥
+    </p>
+
+    <!-- Pular e ir direto -->
+    <button class="t0-skip" onclick="entrarSemLogin()">Continuar sem conta →</button>
+  </div>
+
+</div>
+
+<!-- Toast de boas-vindas -->
+<div class="t0-toast" id="t0-toast">⚽ É nóis, craque! Bem-vindo ao Arena Fut PRO!</div>
+
 <!-- ===== TELA 1: CONFIGURAÇÃO ===== -->
-<div id="tela1">
+<div id="tela1" class="hidden">
   <div class="card" style="border-top: 5px solid var(--neon);">
     <div id="saudacao-container" style="text-align:left; margin-bottom:25px; background:rgba(0,255,136,0.05); padding:15px; border-radius:12px; border:1px solid #222;">
       <h3 id="txt-saudacao" style="color:var(--neon); margin:0; font-size:1.1rem; line-height:1.4;">Carregando...</h3>
@@ -392,8 +643,6 @@ textarea { height: auto; padding: 12px; resize: none; }
 <!-- ===== TELA 3: APP DE JOGO ===== -->
 <div id="tela3">
   <div id="app">
-
-    <!-- SCREEN 3: JOGO ATUAL -->
     <div id="screen-3" class="screen active">
       <div class="header-nav">
         <button class="btn-nav" onclick="irParaTela(2)">← VOLTAR</button>
@@ -445,87 +694,70 @@ textarea { height: auto; padding: 12px; resize: none; }
         <span style="font-weight:bold; color:var(--gold)">RESUMO FINAL</span>
         <div style="width:50px;"></div>
       </div>
-
       <div class="screen-container" id="capture">
-        <!-- HEADER -->
         <div class="t4-header">
           <div class="logo-title">Arena Fut PRO</div>
           <div class="report-bar">MATCH DAY REPORT</div>
           <div class="stats-total">TOTAL GOLS: <span id="report-total-gols">--</span> | TOTAL ATLETAS: <span id="report-total-atletas">--</span></div>
         </div>
-
-        <!-- ── ALTERAÇÃO 4: informações do evento ── -->
         <div class="event-info-bar" id="report-event-info">
           <div class="ei-item"><div class="ei-label">Pelada</div><div class="ei-value" id="ei-nome">--</div></div>
           <div class="ei-item"><div class="ei-label">Data</div><div class="ei-value" id="ei-data">--</div></div>
           <div class="ei-item"><div class="ei-label">Horário</div><div class="ei-value" id="ei-hora">--</div></div>
           <div class="ei-item"><div class="ei-label">Local</div><div class="ei-value" id="ei-local">--</div></div>
         </div>
-
-        <!-- CAMPO TÁTICO SVG -->
         <div class="field-view" id="field-view-4">
           <svg class="pitch-svg" viewBox="0 0 100 148" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
             <rect width="100" height="148" fill="#1e4d1a"/>
-            <rect x="0" y="0"     width="100" height="14.8" fill="#224f1e"/>
-            <rect x="0" y="29.6"  width="100" height="14.8" fill="#224f1e"/>
-            <rect x="0" y="59.2"  width="100" height="14.8" fill="#224f1e"/>
-            <rect x="0" y="88.8"  width="100" height="14.8" fill="#224f1e"/>
+            <rect x="0" y="0" width="100" height="14.8" fill="#224f1e"/>
+            <rect x="0" y="29.6" width="100" height="14.8" fill="#224f1e"/>
+            <rect x="0" y="59.2" width="100" height="14.8" fill="#224f1e"/>
+            <rect x="0" y="88.8" width="100" height="14.8" fill="#224f1e"/>
             <rect x="0" y="118.4" width="100" height="14.8" fill="#224f1e"/>
             <rect x="4" y="4" width="92" height="140" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1.2"/>
             <line x1="4" y1="74" x2="96" y2="74" stroke="rgba(255,255,255,0.85)" stroke-width="1"/>
             <circle cx="50" cy="74" r="12" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="1"/>
             <circle cx="50" cy="74" r="1" fill="rgba(255,255,255,0.7)"/>
-            <rect x="24" y="4"   width="52" height="27" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
-            <rect x="37" y="4"   width="26" height="10" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
-            <rect x="42" y="1.5" width="16" height="4"  rx="1" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.95)" stroke-width="1.4"/>
+            <rect x="24" y="4" width="52" height="27" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
+            <rect x="37" y="4" width="26" height="10" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
+            <rect x="42" y="1.5" width="16" height="4" rx="1" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.95)" stroke-width="1.4"/>
             <circle cx="50" cy="20" r="0.9" fill="rgba(255,255,255,0.8)"/>
             <path d="M30,31 A12,12 0 0,0 70,31" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.9"/>
-            <rect x="24" y="117"   width="52" height="27" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
-            <rect x="37" y="134"   width="26" height="10" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
-            <rect x="42" y="142.5" width="16" height="4"  rx="1" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.95)" stroke-width="1.4"/>
+            <rect x="24" y="117" width="52" height="27" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
+            <rect x="37" y="134" width="26" height="10" fill="none" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
+            <rect x="42" y="142.5" width="16" height="4" rx="1" fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.95)" stroke-width="1.4"/>
             <circle cx="50" cy="128" r="0.9" fill="rgba(255,255,255,0.8)"/>
             <path d="M30,117 A12,12 0 0,1 70,117" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.9"/>
-            <path d="M4,8   A4,4 0 0,0 8,4"    fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
-            <path d="M92,4  A4,4 0 0,0 96,8"   fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
-            <path d="M4,140 A4,4 0 0,1 8,144"  fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
+            <path d="M4,8 A4,4 0 0,0 8,4" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
+            <path d="M92,4 A4,4 0 0,0 96,8" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
+            <path d="M4,140 A4,4 0 0,1 8,144" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
             <path d="M96,140 A4,4 0 0,1 92,144" fill="none" stroke="rgba(255,255,255,0.6)" stroke-width="0.8"/>
           </svg>
           <div id="lineup-overlay" style="position:absolute; top:0; left:0; width:100%; height:100%; pointer-events:none;"></div>
         </div>
         <div class="formation-label" id="formation-label">⚽ ESCALAÇÃO TÁTICA</div>
-
-        <!-- MVP SECTION -->
         <div class="mvp-wrapper">
-          <div class="card-player card-red"  id="mvp-2nd"></div>
+          <div class="card-player card-red" id="mvp-2nd"></div>
           <div class="card-player card-gold" id="mvp-1st"></div>
           <div class="card-player card-blue" id="mvp-3rd"></div>
         </div>
-
-        <!-- CLASSIFICAÇÃO FINAL -->
         <div class="results-box">
           <div class="results-title">🏆 Classificação Final</div>
           <div id="report-ranking"></div>
         </div>
-
-        <!-- LISTA DE PRESENÇA -->
         <div class="presence-box">
           <strong>Lista de Presença:</strong><br>
           <span id="report-presence">--</span>
         </div>
-
         <div class="t4-footer"><div>Arena Fut PRO V2</div></div>
       </div>
-
       <button class="btn-share" onclick="shareReport()">COMPARTILHAR RESULTADO</button>
       <button class="btn-finalizar" onclick="irParaTela(3)" style="margin-top:10px;">VOLTAR AO JOGO</button>
     </div>
-
   </div>
 </div>
 
 <!-- ===== MODAIS ===== -->
-
-<!-- Modal de confirmação genérico -->
 <div id="modal-confirm" class="modal">
   <div class="m-content" style="text-align:center;">
     <h4 id="confirm-msg" style="color:#fff;">Tem certeza?</h4>
@@ -535,8 +767,6 @@ textarea { height: auto; padding: 12px; resize: none; }
     </div>
   </div>
 </div>
-
-<!-- Modal de assistência (gol) -->
 <div id="modal-assist" class="modal">
   <div class="m-content" style="border-color:var(--neon);">
     <h4 style="text-align:center; margin-top:0">Quem deu o passe? 👟</h4>
@@ -544,8 +774,6 @@ textarea { height: auto; padding: 12px; resize: none; }
     <button onclick="gol(null)" style="width:100%; padding:15px; background:#111; color:#666; border:none; border-radius:10px; margin-top:10px;">GOL INDIVIDUAL</button>
   </div>
 </div>
-
-<!-- Modal de reordenar fila -->
 <div id="modal-fila" class="modal">
   <div class="m-content">
     <h4 style="text-align:center; margin-top:0; color:var(--gold);">Reordenar Fila 📋</h4>
@@ -556,24 +784,16 @@ textarea { height: auto; padding: 12px; resize: none; }
     </div>
   </div>
 </div>
-
-<!-- ── ALTERAÇÃO 1: Modal de substituição ── -->
 <div id="modal-sub" class="modal">
   <div class="m-content" style="border-color: var(--gold);">
     <h4 style="text-align:center; margin-top:0; color:var(--gold);">Substituição ↔️</h4>
-
-    <div class="sub-info-box">
-      Jogador saindo: <strong id="sub-out-label">—</strong>
-    </div>
-
+    <div class="sub-info-box">Jogador saindo: <strong id="sub-out-label">—</strong></div>
     <div class="sub-section-label">Quem entra da fila?</div>
     <div id="sub-in-lista"></div>
-
     <label class="sub-check-label">
       <input type="checkbox" id="sub-definitiva">
       <span>Jogador entra de forma definitiva<br><span style="color:#666; font-size:10px;">(sai permanentemente da lista de próxima)</span></span>
     </label>
-
     <div style="display:flex; gap:10px; margin-top:4px;">
       <button onclick="fecharSub()" style="flex:1; padding:13px; background:#333; color:#fff; border:none; border-radius:10px; font-weight:bold; font-size:12px;">CANCELAR</button>
       <button onclick="confirmarSub()" style="flex:1; padding:13px; background:var(--gold); color:#000; border:none; border-radius:10px; font-weight:bold; font-size:12px;">CONFIRMAR</button>
@@ -582,6 +802,154 @@ textarea { height: auto; padding: 12px; resize: none; }
 </div>
 
 <script>
+/* =============================================
+   FIREBASE CONFIG
+   ⚠️  Substitua pelos dados do SEU projeto no
+       Firebase Console → Configurações → Web App
+   ============================================= */
+const firebaseConfig = {
+  apiKey:            "SUA_API_KEY_AQUI",
+  authDomain:        "SEU_PROJETO.firebaseapp.com",
+  projectId:         "SEU_PROJETO",
+  storageBucket:     "SEU_PROJETO.appspot.com",
+  messagingSenderId: "SEU_SENDER_ID",
+  appId:             "SEU_APP_ID"
+};
+
+let firebaseReady = false;
+let auth = null;
+
+try {
+  firebase.initializeApp(firebaseConfig);
+  auth = firebase.auth();
+  firebaseReady = true;
+} catch(e) {
+  console.warn('Firebase não configurado — modo offline ativo.', e.message);
+}
+
+/* =============================================
+   TELA 0 — PWA INSTALL LOGIC
+   ============================================= */
+let deferredInstallPrompt = null;
+
+// Captura o evento "beforeinstallprompt" (Chrome/Android)
+window.addEventListener('beforeinstallprompt', (e) => {
+  e.preventDefault();
+  deferredInstallPrompt = e;
+  // Mostra botão de instalar
+  const btn = document.getElementById('btn-install-pwa');
+  const sub = document.getElementById('install-sub-text');
+  if (btn) { btn.classList.remove('hidden'); }
+  if (sub) { sub.style.display = 'block'; }
+});
+
+// Detecta iOS Safari
+function isIOS() {
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+function isInStandaloneMode() {
+  return ('standalone' in window.navigator) && window.navigator.standalone;
+}
+
+function instalarPWA() {
+  if (deferredInstallPrompt) {
+    // Android / Chrome Desktop
+    deferredInstallPrompt.prompt();
+    deferredInstallPrompt.userChoice.then((result) => {
+      deferredInstallPrompt = null;
+      if (result.outcome === 'accepted') {
+        document.getElementById('btn-install-pwa').classList.add('hidden');
+        document.getElementById('install-sub-text').style.display = 'none';
+      }
+    });
+  } else if (isIOS()) {
+    // iOS — mostra dica manual
+    const tip = document.getElementById('ios-tip');
+    if (tip) { tip.classList.toggle('show'); }
+  }
+}
+
+// Ao carregar: verifica iOS
+window.addEventListener('load', () => {
+  if (isIOS() && !isInStandaloneMode()) {
+    const btn = document.getElementById('btn-install-pwa');
+    const sub = document.getElementById('install-sub-text');
+    if (btn) {
+      btn.classList.remove('hidden');
+      document.getElementById('install-btn-text').innerText = 'Adicionar à Tela Inicial';
+    }
+    if (sub) { sub.style.display = 'block'; }
+  }
+  // Se já está instalado (standalone), pula tela 0
+  if (isInStandaloneMode()) {
+    entrarSemLogin();
+  }
+});
+
+/* =============================================
+   TELA 0 — GOOGLE LOGIN
+   ============================================= */
+function loginGoogle() {
+  if (!firebaseReady || !auth) {
+    // Firebase não configurado: entra direto
+    entrarComNome('Craque');
+    return;
+  }
+  const btn = document.getElementById('btn-google-login');
+  btn.classList.add('loading');
+
+  const provider = new firebase.auth.GoogleAuthProvider();
+  auth.signInWithPopup(provider)
+    .then((result) => {
+      const user   = result.user;
+      const nome   = user.displayName ? user.displayName.split(' ')[0] : 'Craque';
+      btn.classList.remove('loading');
+      entrarComNome(nome);
+    })
+    .catch((err) => {
+      btn.classList.remove('loading');
+      console.warn('Erro no login:', err.message);
+      // Se o usuário fechou o popup, não mostra erro — só mantém na tela
+    });
+}
+
+function entrarComNome(nome) {
+  // Personaliza a saudação com o primeiro nome do usuário
+  const saudacoes = [
+    `Fala, ${nome}! Já cobrou o PIX de quem disse que 'ia ver e avisava'?`,
+    `Bem-vindo, ${nome}! Preparado para ouvir que o gol foi de banheira o jogo todo?`,
+    `${nome} na área! Vai escalar ou vai deixar o favoritismo decidir?`,
+    `Chegou o craque ${nome}! Boa sorte explicar a escalação pro time perdedor!`,
+    `E aí, ${nome}! Hoje o árbitro é você… e já sabe como termina isso. 😂`
+  ];
+  window._saudacaoPersonalizada = saudacoes[Math.floor(Math.random() * saudacoes.length)];
+  mostrarToast(`⚽ Bem-vindo, ${nome}! É nóis!`);
+  setTimeout(irParaApp, 1200);
+}
+
+function entrarSemLogin() {
+  window._saudacaoPersonalizada = null;
+  irParaApp();
+}
+
+function irParaApp() {
+  const tela0 = document.getElementById('tela0');
+  tela0.style.transition = 'opacity 0.4s ease';
+  tela0.style.opacity = '0';
+  setTimeout(() => {
+    tela0.style.display = 'none';
+    document.getElementById('tela1').classList.remove('hidden');
+    definirSaudacao();
+  }, 380);
+}
+
+function mostrarToast(msg) {
+  const t = document.getElementById('t0-toast');
+  t.innerText = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
 /* =============================================
    ESTADO GLOBAL
    ============================================= */
@@ -592,8 +960,7 @@ const estado = {
   sAzul: 0, sRed: 0, segs: 600, tId: null, autor: null
 };
 
-/* ── ALTERAÇÃO 2: saudações dinâmicas sem nome próprio ── */
-const frasesGestor = [
+const frasesGestorGenericas = [
   "Fala, Capitão! Já cobrou o PIX de quem disse que 'ia ver e avisava'?",
   "Bem-vindo, Presida. Preparado para ouvir que o gol foi de banheira o jogo todo?",
   "E aí, Meu 10! Já sabe quem vai ser o primeiro a pedir pra sair com 2 minutos?",
@@ -604,10 +971,11 @@ const frasesGestor = [
   "Presida na área! Hoje o árbitro é você… e já sabe como termina isso."
 ];
 
-window.onload = function () {
-  document.getElementById('txt-saudacao').innerText =
-    frasesGestor[Math.floor(Math.random() * frasesGestor.length)];
-};
+function definirSaudacao() {
+  const txt = window._saudacaoPersonalizada ||
+    frasesGestorGenericas[Math.floor(Math.random() * frasesGestorGenericas.length)];
+  document.getElementById('txt-saudacao').innerText = txt;
+}
 
 /* =============================================
    NAVEGAÇÃO
@@ -659,18 +1027,17 @@ function iniciarPartida() {
     t: (i < n) ? 'azul' : ((i < 2 * n) ? 'red' : null),
     active: (i < 2 * n)
   }));
-  estado.fila  = confirmados.slice(2 * n).map(a => a.nome);
+  estado.fila = confirmados.slice(2 * n).map(a => a.nome);
   estado.sAzul = 0; estado.sRed = 0;
-  estado.segs  = estado.config.tempoSecs;
+  estado.segs = estado.config.tempoSecs;
   estado.autor = null;
   pauseT();
   document.getElementById('s-azul').innerText = 0;
-  document.getElementById('s-red').innerText  = 0;
+  document.getElementById('s-red').innerText = 0;
   document.getElementById('l-azul').innerHTML = '';
-  document.getElementById('l-red').innerHTML  = '';
+  document.getElementById('l-red').innerHTML = '';
   atualizarDisplayTimer();
 }
-
 function toggleCheck(id) {
   const a = estado.atletasApp[id];
   if (!a.confirmado) { a.confirmado = true; a.ordemConfirmacao = ++estado.contadorOrdem; }
@@ -680,7 +1047,7 @@ function toggleCheck(id) {
 function marcarTodos(status) {
   estado.contadorOrdem = 0;
   if (status) { estado.atletasApp.forEach(a => { a.confirmado = true; a.ordemConfirmacao = ++estado.contadorOrdem; }); }
-  else         { estado.atletasApp.forEach(a => { a.confirmado = false; a.ordemConfirmacao = null; }); }
+  else { estado.atletasApp.forEach(a => { a.confirmado = false; a.ordemConfirmacao = null; }); }
   renderizarLista();
 }
 function processarLista() {
@@ -717,14 +1084,8 @@ function renderizarLista() {
     </div>`).join('');
   atualizarResumos();
 }
-function mudarCategoria(id) {
-  estado.atletasApp[id].cat = estado.atletasApp[id].cat === 'MENSALISTA' ? 'CONVIDADO' : 'MENSALISTA';
-  renderizarLista();
-}
-function mudarNivel(id) {
-  estado.atletasApp[id].stars = (estado.atletasApp[id].stars % 5) + 1;
-  renderizarLista();
-}
+function mudarCategoria(id) { estado.atletasApp[id].cat = estado.atletasApp[id].cat === 'MENSALISTA' ? 'CONVIDADO' : 'MENSALISTA'; renderizarLista(); }
+function mudarNivel(id) { estado.atletasApp[id].stars = (estado.atletasApp[id].stars % 5) + 1; renderizarLista(); }
 function alternarPosicao(id) {
   if (estado.atletasApp[id].pos === 'A') { estado.atletasApp[id].pos = 'G'; estado.atletasApp[id].img = '🧤'; }
   else { estado.atletasApp[id].pos = 'A'; estado.atletasApp[id].img = '👟'; }
@@ -738,24 +1099,21 @@ function filtrarAtletas() {
 }
 function atualizarResumos() {
   const confirmados = estado.atletasApp.filter(a => a.confirmado);
-  const espera      = estado.atletasApp.filter(a => !a.confirmado);
-  const total       = estado.atletasApp.length;
-  const goleiros    = confirmados.filter(a => a.pos === 'G').length;
-  const percConf    = total > 0 ? Math.round((confirmados.length / total) * 100) : 0;
-  const percEsp     = total > 0 ? Math.round((espera.length  / total) * 100) : 0;
-  document.getElementById('percentConf').innerText    = percConf + '%';
-  document.getElementById('barConf').style.width      = percConf + '%';
-  document.getElementById('countEsp').innerText       = `(${espera.length})`;
-  document.getElementById('barEsp').style.width       = percEsp + '%';
-  document.getElementById('totalFooter').innerText    = confirmados.length;
+  const espera = estado.atletasApp.filter(a => !a.confirmado);
+  const total = estado.atletasApp.length;
+  const goleiros = confirmados.filter(a => a.pos === 'G').length;
+  const percConf = total > 0 ? Math.round((confirmados.length / total) * 100) : 0;
+  const percEsp = total > 0 ? Math.round((espera.length / total) * 100) : 0;
+  document.getElementById('percentConf').innerText = percConf + '%';
+  document.getElementById('barConf').style.width = percConf + '%';
+  document.getElementById('countEsp').innerText = `(${espera.length})`;
+  document.getElementById('barEsp').style.width = percEsp + '%';
+  document.getElementById('totalFooter').innerText = confirmados.length;
   document.getElementById('goleirosFooter').innerText = goleiros;
 }
 function pedirConfirmacao(msg, callback) {
   document.getElementById('confirm-msg').innerText = msg;
-  document.getElementById('btn-sim').onclick = () => {
-    callback();
-    document.getElementById('modal-confirm').style.display = 'none';
-  };
+  document.getElementById('btn-sim').onclick = () => { callback(); document.getElementById('modal-confirm').style.display = 'none'; };
   document.getElementById('modal-confirm').style.display = 'flex';
 }
 function processarFim(resultado) {
@@ -772,19 +1130,16 @@ function processarFim(resultado) {
 function rodarFila(time) {
   const n = estado.config.jogadoresPorTime;
   for (let i = 0; i < n; i++) {
-    const nome   = estado.fila.shift() || 'Vaga';
+    const nome = estado.fila.shift() || 'Vaga';
     const player = estado.atletas.find(a => a.n === nome);
     if (player) { player.active = true; player.t = time; }
     else { estado.atletas.push({ n: nome, v: 0, g: 0, a: 0, t: time, active: true }); }
   }
   render();
 }
-
-/* ── ALTERAÇÃO 1: render com botão SUB ── */
 function render() {
   const field = document.getElementById('field');
   if (!field) return;
-
   const buildRow = (a) =>
     `<div class="row">
        <span style="overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:90px;">${a.n}</span>
@@ -793,7 +1148,6 @@ function render() {
          <button class="btn-gol" onclick="abrAssist('${a.n}','${a.t}')">GOL</button>
        </div>
      </div>`;
-
   field.innerHTML = `
     <div class="team-card">
       <div class="t-header" style="background:var(--blue)">TIME AZUL</div>
@@ -803,35 +1157,20 @@ function render() {
       <div class="t-header" style="background:var(--red)">TIME RED</div>
       ${estado.atletas.filter(a => a.t === 'red' && a.active).map(buildRow).join('')}
     </div>`;
-
-  const sorted = [...estado.atletas].sort((a, b) => {
-    if (b.v !== a.v) return b.v - a.v;
-    if (b.g !== a.g) return b.g - a.g;
-    return b.a - a.a;
-  });
-  document.getElementById('r-body').innerHTML = sorted.map(a =>
-    `<tr><td>${a.n}</td><td>${a.v}</td><td>${a.g}</td><td>${a.a}</td></tr>`
-  ).join('');
-
+  const sorted = [...estado.atletas].sort((a, b) => { if (b.v !== a.v) return b.v - a.v; if (b.g !== a.g) return b.g - a.g; return b.a - a.a; });
+  document.getElementById('r-body').innerHTML = sorted.map(a => `<tr><td>${a.n}</td><td>${a.v}</td><td>${a.g}</td><td>${a.a}</td></tr>`).join('');
   const n = estado.config.jogadoresPorTime;
   let fText = '';
-  for (let i = 0; i < estado.fila.length; i += n) {
-    fText += `TIME ${Math.floor(i / n) + 1}: [${estado.fila.slice(i, i + n).join(', ')}]<br>`;
-  }
+  for (let i = 0; i < estado.fila.length; i += n) { fText += `TIME ${Math.floor(i / n) + 1}: [${estado.fila.slice(i, i + n).join(', ')}]<br>`; }
   document.getElementById('fila-lista').innerHTML = fText || 'Fila vazia';
 }
 
-/* ── ALTERAÇÃO 1: lógica completa do modal de substituição ── */
+/* Substituição */
 const subState = { out: null, time: null, inNome: null };
-
 function abrirSub(nome, time) {
-  subState.out   = nome;
-  subState.time  = time;
-  subState.inNome = null;
-
+  subState.out = nome; subState.time = time; subState.inNome = null;
   document.getElementById('sub-out-label').innerText = nome;
-  document.getElementById('sub-definitiva').checked  = false;
-
+  document.getElementById('sub-definitiva').checked = false;
   const lista = document.getElementById('sub-in-lista');
   if (estado.fila.length === 0) {
     lista.innerHTML = '<div class="sub-empty-msg">⚠️ Fila vazia — sem jogadores disponíveis.</div>';
@@ -841,132 +1180,71 @@ function abrirSub(nome, time) {
       return `<button class="sub-player-btn" onclick="selecionarSubIn('${safeNome}', this)">${n}</button>`;
     }).join('');
   }
-
   document.getElementById('modal-sub').style.display = 'flex';
 }
-
 function selecionarSubIn(nome, el) {
   subState.inNome = nome;
   document.querySelectorAll('.sub-player-btn').forEach(b => b.classList.remove('selected'));
   el.classList.add('selected');
 }
-
-function fecharSub() {
-  document.getElementById('modal-sub').style.display = 'none';
-  subState.out = null; subState.time = null; subState.inNome = null;
-}
-
+function fecharSub() { document.getElementById('modal-sub').style.display = 'none'; subState.out = null; subState.time = null; subState.inNome = null; }
 function confirmarSub() {
-  if (!subState.inNome) {
-    alert('Selecione um jogador da fila para entrar.');
-    return;
-  }
-
+  if (!subState.inNome) { alert('Selecione um jogador da fila para entrar.'); return; }
   const definitiva = document.getElementById('sub-definitiva').checked;
-  const tipoTexto  = definitiva ? 'ENTRADA DEFINITIVA\n(sai da lista de próxima)' : 'TEMPORÁRIA\n(posição na fila mantida)';
+  const tipoTexto = definitiva ? 'ENTRADA DEFINITIVA\n(sai da lista de próxima)' : 'TEMPORÁRIA\n(posição na fila mantida)';
   const msg = `Confirmar substituição?\n\n⬅️ SAI: ${subState.out}\n➡️ ENTRA: ${subState.inNome}\n\n${tipoTexto}`;
-
   if (!confirm(msg)) return;
-
-  /* — Executa a substituição — */
   const outPlayer = estado.atletas.find(a => a.n === subState.out);
-  const inPlayer  = estado.atletas.find(a => a.n === subState.inNome);
-
-  // Desativa quem sai
+  const inPlayer = estado.atletas.find(a => a.n === subState.inNome);
   if (outPlayer) {
-    outPlayer.active = false;
-    outPlayer.t = null;
-    if (definitiva) {
-      // Permanente: quem saiu vai ao fim da fila
-      estado.fila.push(subState.out);
-    } else {
-      // Temporária: quem saiu volta ao topo (retorna no próximo rodízio)
-      estado.fila.unshift(subState.out);
-    }
+    outPlayer.active = false; outPlayer.t = null;
+    if (definitiva) estado.fila.push(subState.out);
+    else estado.fila.unshift(subState.out);
   }
-
-  // Remove quem entra da fila
   const filaIdx = estado.fila.indexOf(subState.inNome);
   if (filaIdx > -1) estado.fila.splice(filaIdx, 1);
-
-  // Ativa quem entra
-  if (inPlayer) {
-    inPlayer.active = true;
-    inPlayer.t = subState.time;
-  } else {
-    estado.atletas.push({ n: subState.inNome, v: 0, g: 0, a: 0, t: subState.time, active: true });
-  }
-
-  // Log visual na coluna do time
+  if (inPlayer) { inPlayer.active = true; inPlayer.t = subState.time; }
+  else { estado.atletas.push({ n: subState.inNome, v: 0, g: 0, a: 0, t: subState.time, active: true }); }
   const log = document.getElementById(`l-${subState.time}`);
   log.innerHTML = `<div class="log-item">🔄 <b>${subState.inNome}</b> ↔ ${subState.out}</div>` + log.innerHTML;
-
-  fecharSub();
-  render();
+  fecharSub(); render();
 }
 
-/* =============================================
-   FILA, EDITOR, DRAG-AND-DROP
-   ============================================= */
-function abrirEditorFila() {
-  estado.filaTemp = [...estado.fila];
-  renderEditor();
-  document.getElementById('modal-fila').style.display = 'flex';
-}
+/* Fila editor */
+function abrirEditorFila() { estado.filaTemp = [...estado.fila]; renderEditor(); document.getElementById('modal-fila').style.display = 'flex'; }
 function renderEditor() {
-  const c = document.getElementById('fila-editor-container');
-  c.innerHTML = '';
+  const c = document.getElementById('fila-editor-container'); c.innerHTML = '';
   estado.filaTemp.forEach((n, i) => {
-    const d = document.createElement('div');
-    d.className = 'fila-edit-item'; d.draggable = true;
+    const d = document.createElement('div'); d.className = 'fila-edit-item'; d.draggable = true;
     d.innerHTML = `<span class="nome-jogador">☰ ${n}</span><div class="edit-btns"><button class="btn-edit" onclick="mover(${i},-1)">↑</button><button class="btn-edit" onclick="mover(${i},1)">↓</button><button class="btn-edit" style="color:var(--red)" onclick="estado.filaTemp.splice(${i},1); renderEditor();">✕</button></div>`;
     d.addEventListener('dragstart', () => d.classList.add('dragging'));
-    d.addEventListener('dragend',   () => { d.classList.remove('dragging'); reordenarTemp(); });
+    d.addEventListener('dragend', () => { d.classList.remove('dragging'); reordenarTemp(); });
     c.appendChild(d);
   });
 }
-function reordenarTemp() {
-  estado.filaTemp = [...document.querySelectorAll('.nome-jogador')].map(el => el.innerText.replace('☰ ', ''));
-}
-function mover(i, dir) {
-  const np = i + dir;
-  if (np >= 0 && np < estado.filaTemp.length) {
-    [estado.filaTemp[i], estado.filaTemp[np]] = [estado.filaTemp[np], estado.filaTemp[i]];
-    renderEditor();
-  }
-}
-function fecharFila(save) {
-  if (save) estado.fila = [...estado.filaTemp];
-  document.getElementById('modal-fila').style.display = 'none';
-  render();
-}
+function reordenarTemp() { estado.filaTemp = [...document.querySelectorAll('.nome-jogador')].map(el => el.innerText.replace('☰ ', '')); }
+function mover(i, dir) { const np = i + dir; if (np >= 0 && np < estado.filaTemp.length) { [estado.filaTemp[i], estado.filaTemp[np]] = [estado.filaTemp[np], estado.filaTemp[i]]; renderEditor(); } }
+function fecharFila(save) { if (save) estado.fila = [...estado.filaTemp]; document.getElementById('modal-fila').style.display = 'none'; render(); }
 document.getElementById('fila-editor-container').addEventListener('dragover', e => {
   e.preventDefault();
-  const after   = getDragAfterElement(document.getElementById('fila-editor-container'), e.clientY);
+  const after = getDragAfterElement(document.getElementById('fila-editor-container'), e.clientY);
   const dragging = document.querySelector('.dragging');
   if (after) document.getElementById('fila-editor-container').insertBefore(dragging, after);
-  else       document.getElementById('fila-editor-container').appendChild(dragging);
+  else document.getElementById('fila-editor-container').appendChild(dragging);
 });
 function getDragAfterElement(container, y) {
   const els = [...container.querySelectorAll('.fila-edit-item:not(.dragging)')];
-  return els.reduce((closest, child) => {
-    const box    = child.getBoundingClientRect();
-    const offset = y - box.top - box.height / 2;
-    if (offset < 0 && offset > closest.offset) return { offset, element: child };
-    else return closest;
-  }, { offset: Number.NEGATIVE_INFINITY }).element;
+  return els.reduce((closest, child) => { const box = child.getBoundingClientRect(); const offset = y - box.top - box.height / 2; if (offset < 0 && offset > closest.offset) return { offset, element: child }; else return closest; }, { offset: Number.NEGATIVE_INFINITY }).element;
 }
 
-/* =============================================
-   GOLS E ASSISTÊNCIAS
-   ============================================= */
+/* Gols */
 function gol(assist) {
   const aObj = estado.atletas.find(x => x.n === estado.autor);
   aObj.g++;
   if (assist) estado.atletas.find(x => x.n === assist).a++;
   aObj.t === 'azul' ? estado.sAzul++ : estado.sRed++;
   document.getElementById('s-azul').innerText = estado.sAzul;
-  document.getElementById('s-red').innerText  = estado.sRed;
+  document.getElementById('s-red').innerText = estado.sRed;
   document.getElementById('modal-assist').style.display = 'none';
   const log = document.getElementById(`l-${aObj.t}`);
   log.innerHTML = `<div class="log-item">⚽ <b>${estado.autor}</b> ${assist ? '(👟 ' + assist + ')' : ''}</div>` + log.innerHTML;
@@ -975,227 +1253,100 @@ function gol(assist) {
 function abrAssist(n, t) {
   estado.autor = n;
   const opts = document.getElementById('opts');
-  opts.innerHTML = estado.atletas
-    .filter(a => a.t === t && a.active && a.n !== n)
-    .map(c => `<button onclick="gol('${c.n}')" style="width:100%; padding:12px; margin:5px 0; background:#222; color:#fff; border:1px solid #444; border-radius:10px;">${c.n}</button>`)
-    .join('');
+  opts.innerHTML = estado.atletas.filter(a => a.t === t && a.active && a.n !== n).map(c => `<button onclick="gol('${c.n}')" style="width:100%; padding:12px; margin:5px 0; background:#222; color:#fff; border:1px solid #444; border-radius:10px;">${c.n}</button>`).join('');
   document.getElementById('modal-assist').style.display = 'flex';
 }
 function resetPlacar() {
   estado.sAzul = 0; estado.sRed = 0;
   document.getElementById('s-azul').innerText = 0;
-  document.getElementById('s-red').innerText  = 0;
+  document.getElementById('s-red').innerText = 0;
   document.getElementById('l-azul').innerHTML = '';
-  document.getElementById('l-red').innerHTML  = '';
+  document.getElementById('l-red').innerHTML = '';
   resetT();
 }
 
-/* =============================================
-   TIMER
-   ============================================= */
-function atualizarDisplayTimer() {
-  const m = Math.floor(estado.segs / 60);
-  const s = estado.segs % 60;
-  document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
-}
-function startT() {
-  if (!estado.tId) {
-    estado.tId = setInterval(() => { if (estado.segs > 0) { estado.segs--; atualizarDisplayTimer(); } }, 1000);
-  }
-}
+/* Timer */
+function atualizarDisplayTimer() { const m = Math.floor(estado.segs / 60); const s = estado.segs % 60; document.getElementById('timer').innerText = `${m}:${s < 10 ? '0' : ''}${s}`; }
+function startT() { if (!estado.tId) { estado.tId = setInterval(() => { if (estado.segs > 0) { estado.segs--; atualizarDisplayTimer(); } }, 1000); } }
 function pauseT() { clearInterval(estado.tId); estado.tId = null; }
-function resetT()  { pauseT(); estado.segs = estado.config.tempoSecs; atualizarDisplayTimer(); }
-function addRetardatario() {
-  const inp = document.getElementById('add-nome');
-  if (inp.value.trim()) { estado.fila.push(inp.value.trim()); inp.value = ''; render(); }
-}
+function resetT() { pauseT(); estado.segs = estado.config.tempoSecs; atualizarDisplayTimer(); }
+function addRetardatario() { const inp = document.getElementById('add-nome'); if (inp.value.trim()) { estado.fila.push(inp.value.trim()); inp.value = ''; render(); } }
 
-/* =============================================
-   TELA 4 — ESCALAÇÃO TÁTICA
-   ============================================= */
+/* Tela 4 — escalação */
 function getFormationPositions(n) {
-  const pos = {
-    1:  [{ x:50, y:88 }],
-    2:  [{ x:50, y:88 }, { x:50, y:28 }],
-    3:  [{ x:50, y:88 }, { x:26, y:55 }, { x:74, y:55 }],
-    4:  [{ x:50, y:88 }, { x:26, y:62 }, { x:74, y:62 }, { x:50, y:26 }],
-    5:  [
-          { x:50, y:88 },
-          { x:22, y:65 }, { x:78, y:65 },
-          { x:50, y:45 },
-          { x:50, y:18 }
-        ],
-    6:  [
-          { x:50, y:88 },
-          { x:18, y:66 }, { x:50, y:66 }, { x:82, y:66 },
-          { x:30, y:36 }, { x:70, y:36 }
-        ],
-    7:  [
-          { x:50, y:88 },
-          { x:18, y:68 }, { x:50, y:68 }, { x:82, y:68 },
-          { x:25, y:47 }, { x:75, y:47 },
-          { x:50, y:20 }
-        ],
-    8:  [
-          { x:50, y:88 },
-          { x:14, y:70 }, { x:38, y:70 }, { x:62, y:70 }, { x:86, y:70 },
-          { x:28, y:47 }, { x:72, y:47 },
-          { x:50, y:20 }
-        ],
-    9:  [
-          { x:50, y:88 },
-          { x:14, y:70 }, { x:38, y:70 }, { x:62, y:70 }, { x:86, y:70 },
-          { x:20, y:50 }, { x:50, y:50 }, { x:80, y:50 },
-          { x:50, y:20 }
-        ],
-    10: [
-          { x:50, y:88 },
-          { x:14, y:72 }, { x:38, y:72 }, { x:62, y:72 }, { x:86, y:72 },
-          { x:18, y:52 }, { x:42, y:52 }, { x:58, y:52 }, { x:82, y:52 },
-          { x:50, y:20 }
-        ],
-    11: [
-          { x:50, y:88 },
-          { x:14, y:73 }, { x:38, y:73 }, { x:62, y:73 }, { x:86, y:73 },
-          { x:14, y:53 }, { x:38, y:53 }, { x:62, y:53 }, { x:86, y:53 },
-          { x:30, y:24 }, { x:70, y:24 }
-        ]
-  };
+  const pos = { 1:[{x:50,y:88}], 2:[{x:50,y:88},{x:50,y:28}], 3:[{x:50,y:88},{x:26,y:55},{x:74,y:55}], 4:[{x:50,y:88},{x:26,y:62},{x:74,y:62},{x:50,y:26}], 5:[{x:50,y:88},{x:22,y:65},{x:78,y:65},{x:50,y:45},{x:50,y:18}], 6:[{x:50,y:88},{x:18,y:66},{x:50,y:66},{x:82,y:66},{x:30,y:36},{x:70,y:36}], 7:[{x:50,y:88},{x:18,y:68},{x:50,y:68},{x:82,y:68},{x:25,y:47},{x:75,y:47},{x:50,y:20}], 8:[{x:50,y:88},{x:14,y:70},{x:38,y:70},{x:62,y:70},{x:86,y:70},{x:28,y:47},{x:72,y:47},{x:50,y:20}], 9:[{x:50,y:88},{x:14,y:70},{x:38,y:70},{x:62,y:70},{x:86,y:70},{x:20,y:50},{x:50,y:50},{x:80,y:50},{x:50,y:20}], 10:[{x:50,y:88},{x:14,y:72},{x:38,y:72},{x:62,y:72},{x:86,y:72},{x:18,y:52},{x:42,y:52},{x:58,y:52},{x:82,y:52},{x:50,y:20}], 11:[{x:50,y:88},{x:14,y:73},{x:38,y:73},{x:62,y:73},{x:86,y:73},{x:14,y:53},{x:38,y:53},{x:62,y:53},{x:86,y:53},{x:30,y:24},{x:70,y:24}] };
   if (pos[n]) return pos[n];
-  const result = [{ x:50, y:88 }];
-  for (let i = 0; i < n - 1; i++) result.push({ x: 10 + (80 * (i + 1) / n), y: 40 });
-  return result;
+  const result = [{x:50,y:88}]; for (let i = 0; i < n-1; i++) result.push({x: 10+(80*(i+1)/n), y:40}); return result;
 }
-function getFormationLabel(n) {
-  const labels = { 3:'1-2', 4:'2-1', 5:'2-1-1', 6:'3-2', 7:'3-2-1', 8:'4-2-1', 9:'4-3-1', 10:'4-4-1', 11:'4-4-2' };
-  return labels[n] ? `⚽ ESCALAÇÃO TÁTICA · ${labels[n]}` : '⚽ ESCALAÇÃO TÁTICA';
-}
+function getFormationLabel(n) { const labels = {3:'1-2',4:'2-1',5:'2-1-1',6:'3-2',7:'3-2-1',8:'4-2-1',9:'4-3-1',10:'4-4-1',11:'4-4-2'}; return labels[n] ? `⚽ ESCALAÇÃO TÁTICA · ${labels[n]}` : '⚽ ESCALAÇÃO TÁTICA'; }
 function renderLineup() {
   const n = estado.config.jogadoresPorTime;
-  const sorted = [...estado.atletas].sort((a, b) => {
-    if (b.v !== a.v) return b.v - a.v;
-    if (b.g !== a.g) return b.g - a.g;
-    return b.a - a.a;
-  });
+  const sorted = [...estado.atletas].sort((a,b) => { if(b.v!==a.v) return b.v-a.v; if(b.g!==a.g) return b.g-a.g; return b.a-a.a; });
   const positions = getFormationPositions(n);
-  const overlay   = document.getElementById('lineup-overlay');
+  const overlay = document.getElementById('lineup-overlay');
   overlay.innerHTML = '';
   const count = Math.min(n, positions.length, sorted.length);
   for (let i = 0; i < count; i++) {
-    const player = sorted[i];
-    const pos    = positions[i];
+    const player = sorted[i]; const pos = positions[i];
     const firstName = player.n.split(' ')[0];
-    const dot = document.createElement('div');
-    dot.className = 'player-dot';
-    dot.style.left = pos.x + '%';
-    dot.style.top  = pos.y + '%';
-    dot.innerHTML  = `<div class="dot">${i + 1}</div><span class="player-name-tag">${firstName}</span>`;
+    const dot = document.createElement('div'); dot.className = 'player-dot';
+    dot.style.left = pos.x + '%'; dot.style.top = pos.y + '%';
+    dot.innerHTML = `<div class="dot">${i+1}</div><span class="player-name-tag">${firstName}</span>`;
     overlay.appendChild(dot);
   }
   document.getElementById('formation-label').innerText = getFormationLabel(n);
 }
 
-/* =============================================
-   TELA 4 — RELATÓRIO COMPLETO
-   ============================================= */
+/* Tela 4 — relatório */
 function populateReport() {
-  const atletas    = estado.atletas;
-  const atletasApp = estado.atletasApp;
-
-  /* ── ALTERAÇÃO 4: preenche informações do evento ── */
+  const atletas = estado.atletas; const atletasApp = estado.atletasApp;
   const nomeEvento = document.getElementById('nomeEvento').value.trim() || '—';
-  const dataEv     = document.getElementById('dataEv').value;
-  const horario    = document.getElementById('horarioEv').value || '—';
-  const local      = document.getElementById('local').value.trim() || '—';
-  let dataFormatada = '—';
-  if (dataEv) {
-    const [y, m, d] = dataEv.split('-');
-    dataFormatada = `${d}/${m}/${y}`;
-  }
-  document.getElementById('ei-nome').innerText  = nomeEvento;
-  document.getElementById('ei-data').innerText  = dataFormatada;
-  document.getElementById('ei-hora').innerText  = horario;
+  const dataEv = document.getElementById('dataEv').value;
+  const horario = document.getElementById('horarioEv').value || '—';
+  const local = document.getElementById('local').value.trim() || '—';
+  let dataFormatada = '—'; if (dataEv) { const [y,m,d] = dataEv.split('-'); dataFormatada = `${d}/${m}/${y}`; }
+  document.getElementById('ei-nome').innerText = nomeEvento;
+  document.getElementById('ei-data').innerText = dataFormatada;
+  document.getElementById('ei-hora').innerText = horario;
   document.getElementById('ei-local').innerText = local;
-
-  /* Totais */
-  const totalGols    = atletas.reduce((sum, a) => sum + a.g, 0);
-  const totalAtletas = atletas.length;
-  document.getElementById('report-total-gols').innerText    = totalGols;
-  document.getElementById('report-total-atletas').innerText = totalAtletas;
-
-  /* Ordenação */
-  const sorted = [...atletas].sort((a, b) => {
-    if (b.v !== a.v) return b.v - a.v;
-    if (b.g !== a.g) return b.g - a.g;
-    return b.a - a.a;
-  });
-
-  /* MVP cards */
-  const medals = ['🥇','🥈','🥉'];
-  const labels  = ['MVP','2º Lugar','3º Lugar'];
+  const totalGols = atletas.reduce((sum,a) => sum+a.g, 0);
+  document.getElementById('report-total-gols').innerText = totalGols;
+  document.getElementById('report-total-atletas').innerText = atletas.length;
+  const sorted = [...atletas].sort((a,b) => { if(b.v!==a.v) return b.v-a.v; if(b.g!==a.g) return b.g-a.g; return b.a-a.a; });
+  const medals = ['🥇','🥈','🥉']; const labels = ['MVP','2º Lugar','3º Lugar'];
   function buildMvpCard(atleta, pos) {
     if (!atleta) return '<span style="color:#444; font-size:10px">—</span>';
-    return `
-      <div style="font-size:${pos===0?'22px':'18px'}">${medals[pos]}</div>
-      <div style="font-size:${pos===0?'12px':'11px'}; font-weight:bold; color:#fff; margin:4px 0; word-break:break-word;">${atleta.n}</div>
-      <div class="stat-val">${atleta.g}G</div>
-      <div class="label-stat">${atleta.v}V · ${atleta.a}A</div>
-      <div class="label-stat" style="margin-top:2px">${labels[pos]}</div>`;
+    return `<div style="font-size:${pos===0?'22px':'18px'}">${medals[pos]}</div><div style="font-size:${pos===0?'12px':'11px'}; font-weight:bold; color:#fff; margin:4px 0; word-break:break-word;">${atleta.n}</div><div class="stat-val">${atleta.g}G</div><div class="label-stat">${atleta.v}V · ${atleta.a}A</div><div class="label-stat" style="margin-top:2px">${labels[pos]}</div>`;
   }
-  document.getElementById('mvp-1st').innerHTML = buildMvpCard(sorted[0] || null, 0);
-  document.getElementById('mvp-2nd').innerHTML = buildMvpCard(sorted[1] || null, 1);
-  document.getElementById('mvp-3rd').innerHTML = buildMvpCard(sorted[2] || null, 2);
-
-  /* Classificação completa */
-  if (sorted.length === 0) {
-    document.getElementById('report-ranking').innerHTML =
-      '<div style="color:#444; text-align:center; font-size:11px; padding:10px;">Nenhum dado de jogo registrado.</div>';
-  } else {
-    document.getElementById('report-ranking').innerHTML = sorted.map((a, i) => `
-      <div class="row">
-        <span>${i + 1}. ${a.n}</span>
-        <span style="color:var(--text-gray)">${a.v}V &nbsp; ${a.g}G &nbsp; ${a.a}A</span>
-      </div>`).join('');
-  }
-
-  /* Lista de presença */
+  document.getElementById('mvp-1st').innerHTML = buildMvpCard(sorted[0]||null,0);
+  document.getElementById('mvp-2nd').innerHTML = buildMvpCard(sorted[1]||null,1);
+  document.getElementById('mvp-3rd').innerHTML = buildMvpCard(sorted[2]||null,2);
+  if (sorted.length===0) { document.getElementById('report-ranking').innerHTML = '<div style="color:#444; text-align:center; font-size:11px; padding:10px;">Nenhum dado de jogo registrado.</div>'; }
+  else { document.getElementById('report-ranking').innerHTML = sorted.map((a,i) => `<div class="row"><span>${i+1}. ${a.n}</span><span style="color:var(--text-gray)">${a.v}V &nbsp; ${a.g}G &nbsp; ${a.a}A</span></div>`).join(''); }
   const confirmados = atletasApp.filter(a => a.confirmado);
-  if (confirmados.length > 0)      document.getElementById('report-presence').innerText = confirmados.map(a => a.nome).join(', ');
-  else if (atletas.length > 0)     document.getElementById('report-presence').innerText = atletas.map(a => a.n).join(', ');
-  else                             document.getElementById('report-presence').innerText = 'Nenhum atleta registrado.';
-
-  /* Escalação tática */
+  if (confirmados.length>0) document.getElementById('report-presence').innerText = confirmados.map(a=>a.nome).join(', ');
+  else if (atletas.length>0) document.getElementById('report-presence').innerText = atletas.map(a=>a.n).join(', ');
+  else document.getElementById('report-presence').innerText = 'Nenhum atleta registrado.';
   renderLineup();
 }
 
-/* shareReport */
 async function shareReport() {
   const container = document.getElementById('capture');
   try {
-    const canvas = await html2canvas(container, {
-      backgroundColor: '#0c0e11', scale: 2,
-      width: container.scrollWidth + 10,
-      windowWidth: document.body.offsetWidth
-    });
+    const canvas = await html2canvas(container, { backgroundColor:'#0c0e11', scale:2, width:container.scrollWidth+10, windowWidth:document.body.offsetWidth });
     canvas.toBlob(async (blob) => {
-      const file = new File([blob], 'relatorio-arena.png', { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        await navigator.share({ files: [file] });
-      } else {
-        const link = document.createElement('a');
-        link.download = 'relatorio.png';
-        link.href = canvas.toDataURL();
-        link.click();
-      }
+      const file = new File([blob], 'relatorio-arena.png', {type:'image/png'});
+      if (navigator.canShare && navigator.canShare({files:[file]})) { await navigator.share({files:[file]}); }
+      else { const link = document.createElement('a'); link.download='relatorio.png'; link.href=canvas.toDataURL(); link.click(); }
     });
-  } catch (err) { console.error('Erro ao compartilhar:', err); }
+  } catch(err) { console.error('Erro ao compartilhar:', err); }
 }
 </script>
 
 <script>
-        if ("serviceWorker" in navigator) {
-            navigator.serviceWorker.register("sw.js");
-        }
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("sw.js");
+  }
 </script>
 </body>
 </html>
